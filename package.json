@@ -1,0 +1,26 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "license": "MIT",
+  "scripts": {
+    "compile": "tsc",
+    "start_originalScriptFromApolloDocs": "npm run compile && node ./dist/index.js",
+    "dev": "ts-node-dev -r tsconfig-paths/register src/index.ts",
+    "build": "rm -rf build && tsc",
+    "start": "node -r ts-node/register/transpile-only -r tsconfig-paths/register build/index.js"
+  },
+  "dependencies": {
+    "@apollo/server": "^4.7.1",
+    "graphql": "^16.6.0",
+    "ts-node-dev": "^1.1.8",
+    "tsconfig-paths": "^3.11.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.2",
+    "@typescript-eslint/parser": "^5.59.2",
+    "eslint": "^8.39.0",
+    "typescript": "^5.0.4"
+  }
+}
