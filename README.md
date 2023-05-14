@@ -1,3 +1,32 @@
+# How to copy .graphql files when building project with `tsc` compilator
+
+It's impossible to copy non-typescript files when buildng project with `tsc` compilator as it copies only ts files. To copy .graphql files we can use `copyfile` package
+
+`1` - install package with `yarn add -D copyfiles`
+`2` - add `copy-file` script to your `package.json` scripts:
+
+```json
+{
+  "scripts": {
+    "copy-files": "copyfiles -u 1 src/**/*.graphql build/src"
+  }
+}
+```
+
+`3` - add `&& yarn copy-files` script part to your `build` script:
+
+```json
+{
+  "scripts": {
+    "build": "rm -rf build && tsc && yarn copy-files" // added "&& yarn copy-files"
+  }
+}
+```
+
+copyfiles package with parameters will copy all files to another folder with the same path.
+
+Found [here](https://vccolombo.github.io/blog/tsc-how-to-copy-non-typescript-files-when-building/#copyfiles)
+
 # Error `Package subpath './dist/esm/errors' is not defined by "exports"`
 
 if you have error like this:
@@ -8,7 +37,7 @@ $ yarn dev
 yarn run v1.22.4
 $ ts-node-dev -r tsconfig-paths/register src/index.ts
 [INFO] 14:54:13 ts-node-dev ver. 1.1.8 (using ts-node ver. 9.1.1, typescript ver. 5.0.4)
-Error [ERR_PACKAGE_PATH_NOT_EXPORTED]: Package subpath './dist/esm/errors' is not defined by "exports" in D:\MY-GRAPHQL-SHOP-MAGISTERKA\server — kopia jak juz nie dzial
+Error [ERR_PACKAGE_PATH_NOT_EXPORTED]: Package subpath './dist/esm/errors' is not defined by "exports" in Some\path\on\my\computer\server — kopia jak juz nie dzial
 
 alo\node_modules\@apollo\server\package.json
     at new NodeError (internal/errors.js:322:7)
@@ -17,11 +46,11 @@ alo\node_modules\@apollo\server\package.json
     at resolveExports (internal/modules/cjs/loader.js:478:36)
     at Function.Module._findPath (internal/modules/cjs/loader.js:518:31)
     at Function.Module._resolveFilename (internal/modules/cjs/loader.js:917:27)
-    at Function.Module._resolveFilename (D:\MY-GRAPHQL-SHOP-MAGISTERKA\server — kopia jak juz nie dzialalo\node_modules\tsconfig-paths\src\register.ts:90:36)
+    at Function.Module._resolveFilename (Some\path\on\my\computer\server — kopia jak juz nie dzialalo\node_modules\tsconfig-paths\src\register.ts:90:36)
     at Function.Module._load (internal/modules/cjs/loader.js:774:27)
     at Module.require (internal/modules/cjs/loader.js:1003:19)
     at require (internal/modules/cjs/helpers.js:107:18)
-[ERROR] 14:54:17 Error: Package subpath './dist/esm/errors' is not defined by "exports" in D:\MY-GRAPHQL-SHOP-MAGISTERKA\server — kopia jak juz nie dzialalo\node_module
+[ERROR] 14:54:17 Error: Package subpath './dist/esm/errors' is not defined by "exports" in Some\path\on\my\computer\server — kopia jak juz nie dzialalo\node_module
 s\@apollo\server\package.json
 
 ```
@@ -325,7 +354,7 @@ $ graphql-codegen --config codegen.ts
     ✖
             Failed to load schema from ./src/schema-graphql.ts:
 
-            Unable to load from file "D:/MY-GRAPHQL-SHOP-MAGISTERKA/server/src/schema-graphql.ts": D:…
+            Unable to load from file "Some\path\on\my\computer/server/src/schema-graphql.ts": D:…
     ◼ Load GraphQL documents
     ◼ Generate
 error Command failed with exit code 1.
@@ -517,13 +546,13 @@ warning "@graphql-codegen/cli > @graphql-tools/github-loader > @graphql-tools/gr
 peer dependency "@babel/core@^7.0.0-0".
 [4/4] Building fresh packages...
 [-/2] ⠈ waiting...
-error D:\MY-GRAPHQL-SHOP-MAGISTERKA\server\node_modules\@parcel\watcher: Command failed.
+error Some\path\on\my\computer\server\node_modules\@parcel\watcher: Command failed.
 Exit code: 1
 Command: node-gyp-build
 Arguments:
-Directory: D:\MY-GRAPHQL-SHOP-MAGISTERKA\server\node_modules\@parcel\watcher
+Directory: Some\path\on\my\computer\server\node_modules\@parcel\watcher
 Output:
-D:\MY-GRAPHQL-SHOP-MAGISTERKA\server\node_modules\@parcel\watcher>if not defined npm_config_node_gyp (node "D:\Program Files\nodejs\node_modules\npm\bin\no
+Some\path\on\my\computer\server\node_modules\@parcel\watcher>if not defined npm_config_node_gyp (node "D:\Program Files\nodejs\node_modules\npm\bin\no
 de-gyp-bin\\..\..\node_modules\node-gyp\bin\node-gyp.js" rebuild )  else (node "" rebuild )
 gyp info it worked if it ends with ok
 gyp info using node-gyp@5.1.0
@@ -571,7 +600,7 @@ gyp ERR! stack     at onErrorNT (internal/child_process.js:469:16)
 gyp ERR! stack     at processTicksAndRejections (internal/process/task_queues.js:82:21)
 gyp ERR! System Windows_NT 10.0.19044
 gyp ERR! command "D:\\Program Files\\nodejs\\node.exe" "D:\\Program Files\\nodejs\\node_modules\\npm\\node_modules\\node-gyp\\bin\\node-gyp.js" "rebuild"
-gyp ERR! cwd D:\MY-GRAPHQL-SHOP-MAGISTERKA\server\node_modules\@parcel\watcher
+gyp ERR! cwd Some\path\on\my\computer\server\node_modules\@parcel\watcher
 gyp ERR! node -v v14.18.2
 gyp ERR! node-gyp -v v5.1.0
 gyp ERR! not ok
