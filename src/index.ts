@@ -19,7 +19,7 @@ startStandaloneServer(server, {
 })
   .then(({ url }) => {
     // eslint-disable-next-line no-console
-    console.log(`🚀  Server ready at: ${url}`);
+    console.log(`Server ready at: ${url}`);
 
     mongoose
       .connect(MONGO_DB_URI, {

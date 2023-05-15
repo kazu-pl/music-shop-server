@@ -15,12 +15,9 @@ export type Scalars = {
   Float: number;
 };
 
-export type Animal = {
-  __typename?: 'Animal';
-  age?: Maybe<Scalars['Int']>;
-  childrenNumber?: Maybe<Array<Maybe<Book>>>;
-  id?: Maybe<Scalars['ID']>;
-  name?: Maybe<Scalars['String']>;
+export type AccessTokenResponse = {
+  __typename?: 'AccessTokenResponse';
+  accessToken: Scalars['String'];
 };
 
 export type Book = {
@@ -38,7 +35,13 @@ export type Mutation = {
   __typename?: 'Mutation';
   /** use this mutation to send email and password and get JWT tokens */
   login: Tokens;
+  /**
+   * Description for field
+   * Supports **multi-line** description for your [API](http://example.com)!
+   */
   register: SuccessfulReqMsg;
+  /** use this to get new accessToken if yours expired. Pass refreshToken to obtain accessToken */
+  renewAccessToken: AccessTokenResponse;
 };
 
 
@@ -51,10 +54,18 @@ export type MutationRegisterArgs = {
   registerCredentials: RegisterCredentialsInput;
 };
 
+
+export type MutationRenewAccessTokenArgs = {
+  refreshCredentials: RefreshTokenInput;
+};
+
 export type Query = {
   __typename?: 'Query';
   books?: Maybe<Array<Maybe<Book>>>;
-  getBooks: Array<Maybe<Book>>;
+};
+
+export type RefreshTokenInput = {
+  refreshToken: Scalars['String'];
 };
 
 export type RegisterCredentialsInput = {
@@ -151,14 +162,13 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
-  Animal: ResolverTypeWrapper<Animal>;
+  AccessTokenResponse: ResolverTypeWrapper<AccessTokenResponse>;
   Book: ResolverTypeWrapper<Book>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
-  ID: ResolverTypeWrapper<Scalars['ID']>;
-  Int: ResolverTypeWrapper<Scalars['Int']>;
   LoginCredentialsInput: LoginCredentialsInput;
   Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
+  RefreshTokenInput: RefreshTokenInput;
   RegisterCredentialsInput: RegisterCredentialsInput;
   String: ResolverTypeWrapper<Scalars['String']>;
   SuccessfulReqMsg: ResolverTypeWrapper<SuccessfulReqMsg>;
@@ -167,25 +177,21 @@ export type ResolversTypes = {
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
-  Animal: Animal;
+  AccessTokenResponse: AccessTokenResponse;
   Book: Book;
   Boolean: Scalars['Boolean'];
-  ID: Scalars['ID'];
-  Int: Scalars['Int'];
   LoginCredentialsInput: LoginCredentialsInput;
   Mutation: {};
   Query: {};
+  RefreshTokenInput: RefreshTokenInput;
   RegisterCredentialsInput: RegisterCredentialsInput;
   String: Scalars['String'];
   SuccessfulReqMsg: SuccessfulReqMsg;
   Tokens: Tokens;
 };
 
-export type AnimalResolvers<ContextType = any, ParentType extends ResolversParentTypes['Animal'] = ResolversParentTypes['Animal']> = {
-  age?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  childrenNumber?: Resolver<Maybe<Array<Maybe<ResolversTypes['Book']>>>, ParentType, ContextType>;
-  id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
-  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+export type AccessTokenResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['AccessTokenResponse'] = ResolversParentTypes['AccessTokenResponse']> = {
+  accessToken?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -198,11 +204,11 @@ export type BookResolvers<ContextType = any, ParentType extends ResolversParentT
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   login?: Resolver<ResolversTypes['Tokens'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'loginCredentials'>>;
   register?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'registerCredentials'>>;
+  renewAccessToken?: Resolver<ResolversTypes['AccessTokenResponse'], ParentType, ContextType, RequireFields<MutationRenewAccessTokenArgs, 'refreshCredentials'>>;
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   books?: Resolver<Maybe<Array<Maybe<ResolversTypes['Book']>>>, ParentType, ContextType>;
-  getBooks?: Resolver<Array<Maybe<ResolversTypes['Book']>>, ParentType, ContextType>;
 };
 
 export type SuccessfulReqMsgResolvers<ContextType = any, ParentType extends ResolversParentTypes['SuccessfulReqMsg'] = ResolversParentTypes['SuccessfulReqMsg']> = {
@@ -217,7 +223,7 @@ export type TokensResolvers<ContextType = any, ParentType extends ResolversParen
 };
 
 export type Resolvers<ContextType = any> = {
-  Animal?: AnimalResolvers<ContextType>;
+  AccessTokenResponse?: AccessTokenResponseResolvers<ContextType>;
   Book?: BookResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;

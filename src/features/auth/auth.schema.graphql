@@ -17,6 +17,10 @@ type Tokens {
   refreshToken: String!
 }
 
+type AccessTokenResponse {
+  accessToken: String!
+}
+
 input LoginCredentialsInput {
   email: String!
   password: String!
@@ -29,23 +33,24 @@ input RegisterCredentialsInput {
   surname: String!
 }
 
-type Animal {
-  id: ID
-  name: String
-  age: Int
-  childrenNumber: [Book]
+input RefreshTokenInput {
+  refreshToken: String!
 }
 
 type Query {
   books: [Book]
 }
 
-type Query {
-  getBooks: [Book]!
-}
-
 type Mutation {
+  """
+  Description for field
+  Supports **multi-line** description for your [API](http://example.com)!
+  """
+  register(registerCredentials: RegisterCredentialsInput!): SuccessfulReqMsg!
+
   "use this mutation to send email and password and get JWT tokens"
   login(loginCredentials: LoginCredentialsInput!): Tokens!
-  register(registerCredentials: RegisterCredentialsInput!): SuccessfulReqMsg!
+
+  "use this to get new accessToken if yours expired. Pass refreshToken to obtain accessToken"
+  renewAccessToken(refreshCredentials: RefreshTokenInput!): AccessTokenResponse!
 }
