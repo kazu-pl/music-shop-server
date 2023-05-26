@@ -24,6 +24,9 @@ const config: CodegenConfig = {
         "typescript-resolvers",
         "typescript-document-nodes",
       ],
+      config: {
+        contextType: "../context#Context",
+      },
     },
   },
 };

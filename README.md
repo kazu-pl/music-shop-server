@@ -1,3 +1,128 @@
+# How to make JWT auth and protect some actions and not all:
+
+You can return context object in context and verify jwt token in try/catch so when something bad happens (like token was not provided or expired or is incorrect or whatever) the `jwt.verify()` function will thrown an error which can be catched in `catch` block and in that case you can return `null` as value of `user` key of context. Later on in every protected action you can check if the `user` object exists on context and if not - it means something bad happend and you can thrown an GraphQLError.
+
+Example in context:
+
+```ts
+import { DecodedUser } from "types/jwt.types";
+import { StartStandaloneServerOptions } from "@apollo/server/standalone";
+import { ACCESS_TOKEN_SECRET } from "constants/env";
+import jwt from "jsonwebtoken";
+export interface Context {
+  user: DecodedUser | null;
+}
+
+const context: Exclude<
+  StartStandaloneServerOptions<Context>["context"],
+  undefined
+> = async ({
+  req,
+  // res,
+}) => {
+  try {
+    const accessToken = (req.headers.authorization || "").split(" ")[1]; // Split into ["Bearer", "json.web.token"] and take the actuall token
+
+    const user = jwt.verify(accessToken, ACCESS_TOKEN_SECRET) as DecodedUser;
+
+    return { user } as Context; // return correctly user because token exists, is valid, is NOT expired
+  } catch (err) {
+    // if token was not provided, expired, malformed, or has incorrect format then jwt.verify() will thrown an error which will be catched here in catch so catch will return null as `user` field so if any route is protected and does not receive any token it may throw an GraphQlError("UNAUTHENTICATED"); because no token means no token, token expired, invalid token etc
+    return {
+      user: null,
+    } as Context;
+  }
+};
+
+export default context;
+```
+
+And then in any protected mutation or query:
+
+```ts
+
+    someProtectedMutation(parent, args, context, info) {
+      const { age } = args.data;
+      console.log({ someProtectedMutation_context: context });
+
+      if (!context.user) throw new GraphQLError(AUTH_MESSAGES.UNAUTHENTICATED); // if `user` does not exist on `contxt` it means that something bad happened and token does not exist, is invalid or something like that so return unauthorized
+
+      return {
+        message: "",
+      };
+    },
+```
+
+You can also add some info in schema that the action is protected like so:
+
+```graphql
+type Mutation {
+  """
+  **PROTECTED**
+  """
+  someProtectedMutation(data: ProtectedInput!): SuccessfulReqMsg!
+}
+```
+
+# How to type Context when generating types:
+
+Just use `contextType` property and point to a file with exported context type. This path has to be based on the destination place from which generated file will look for context type.
+
+if using `yml` file:
+
+```yml
+schema: "./src/features/auth/auth.schema.graphql"
+
+generates:
+  ./src/types/graphql.types.ts:
+    plugins:
+      - "typescript"
+      - "typescript-resolvers"
+      - "typescript-document-nodes"
+
+    config:
+      useIndexSignature: true
+
+      # Below link points to file context and exported interface Context AFTER BEING GENERATED (so it's path from the destination dir which is `src/types/graphql.types.ts`)
+      contextType: "../context#Context"
+```
+
+If using `ts` file:
+
+```ts
+import type { CodegenConfig } from "@graphql-codegen/cli";
+
+const config: CodegenConfig = {
+  overwrite: true,
+  schema: "./src/features/auth/auth.schema.graphql",
+
+  generates: {
+    "src/types/graphql.types.ts": {
+      plugins: [
+        "typescript",
+        "typescript-resolvers",
+        "typescript-document-nodes",
+      ],
+      config: {
+        contextType: "../context#Context",
+      },
+    },
+  },
+};
+
+export default config;
+```
+
+and then poin to that file in script from `package.json` that generates types:
+
+```json
+{
+  "scripts": {
+    "codegen": "graphql-codegen --config codegen.ts" // if using `yml` file it would be `codegen.yml` or `./src/codegen.yml` depending on its path
+  }
+}
+```
+
 # How to copy .graphql files when building project with `tsc` compilator
 
 It's impossible to copy non-typescript files when buildng project with `tsc` compilator as it copies only ts files. To copy .graphql files we can use `copyfile` package
@@ -404,6 +529,10 @@ const config: CodegenConfig = {
         "typescript-resolvers",
         "typescript-document-nodes",
       ],
+      config: {
+        // you can also read about it in the `How to type Context when generating types` section
+        contextType: "../context#Context", // link to file with Context interface. This link is used AFTER code is generated to serch for Context type
+      },
     },
   },
 };
@@ -418,7 +547,7 @@ you can create it manually, for example create `codegen.yml` and paste:
 ```yml
 # codegen.yml
 
-# This configuration file tells GraphQL Code Generator how
+# This configuration file tells Graphql Code Generator how
 # to generate types based on our schema.
 schema: "./schema.graphql"
 generates:
@@ -429,8 +558,8 @@ generates:
       - "typescript-resolvers"
     config:
       useIndexSignature: true
-      # More on this below!
-      contextType: "../index#MyContext"
+
+      contextType: "../context#Context" # you can also read about it in the `How to type Context when generating types` section
 ```
 
 `3` - add script to `package.json` that will run `codegen` file which will generate types:

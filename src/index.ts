@@ -4,7 +4,7 @@ import { startStandaloneServer } from "@apollo/server/standalone";
 import mongoose from "mongoose";
 import { MONGO_DB_URI, PORT } from "constants/env";
 
-import { Context } from "./context";
+import context, { Context } from "./context";
 import resolvers from "./resolvers";
 import typeDefs from "./typeDefs";
 
@@ -16,10 +16,11 @@ const server = new ApolloServer<Context>({
 
 startStandaloneServer(server, {
   listen: { port: +PORT },
+  context,
 })
   .then(({ url }) => {
     // eslint-disable-next-line no-console
-    console.log(`🚀  Server ready at: ${url}`);
+    console.log(`Server ready at: ${url}`);
 
     mongoose
       .connect(MONGO_DB_URI, {
