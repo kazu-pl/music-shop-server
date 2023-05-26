@@ -5,6 +5,8 @@ const AUTH_MESSAGES = {
   ACCOUNT_CREATED: "Pomyślnie utworzono konto",
   WRONG_PASSWORD: "Niepoprawne hasło",
   SESSION_ENDED: "Sesja wygasła",
+  UNAUTHENTICATED: "Najpierw musisz się zalogować",
+  FORBIDEN: "Nie masz wystarczających uprawień",
 };
 
 export default AUTH_MESSAGES;

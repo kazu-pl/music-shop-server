@@ -14,6 +14,7 @@ import {
   REFRESH_TOKEN_SECRET,
 } from "constants/env";
 import { DecodedUser } from "types/jwt.types";
+import checkAuthentication from "./utils/checkAuthentication";
 
 const books = [
   {
@@ -165,6 +166,16 @@ const authResolvers: Resolvers = {
           throw new GraphQLError(COMMON_MESSAGES.AN_ERROR_OCCURED);
         }
       }
+    },
+    someProtectedMutation(parent, args, context, info) {
+      const { age } = args.data;
+      console.log({ someProtectedMutation_context: context });
+
+      checkAuthentication(context.user);
+
+      return {
+        message: `lat: ${age}`,
+      };
     },
   },
 };
