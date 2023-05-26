@@ -16,22 +16,40 @@ import {
 import { DecodedUser } from "types/jwt.types";
 import checkAuthentication from "./utils/checkAuthentication";
 
-const books = [
-  {
-    title: "The Awakening",
-    author: "Kate Chopin",
-  },
-  {
-    title: "City of Glass",
-    author: "Paul Auster",
-  },
-];
-
 const emailSchema = string().email();
 
 const authResolvers: Resolvers = {
   Query: {
-    books: () => books,
+    getUserData: async (parent, args, context) => {
+      checkAuthentication(context.user);
+
+      const result = await UserModel.findOne({
+        _id: context.user?._id,
+      }).exec();
+
+      if (!result) {
+        throw new GraphQLError(COMMON_MESSAGES.NOT_FOUND_FN("użytkownika"));
+      }
+
+      return result.data;
+    },
+    removeUser: async (parent, args, context) => {
+      checkAuthentication(context.user);
+
+      const result = await UserModel.findOne({
+        _id: context.user?._id,
+      }).exec();
+
+      if (!result) {
+        throw new GraphQLError(COMMON_MESSAGES.NOT_FOUND_FN("użytkownika"));
+      }
+      try {
+        await result.deleteOne();
+        return { message: AUTH_MESSAGES.ACCOUNT_REMOVED };
+      } catch (error) {
+        throw new GraphQLError(COMMON_MESSAGES.AN_ERROR_OCCURED);
+      }
+    },
   },
 
   Mutation: {
@@ -87,11 +105,25 @@ const authResolvers: Resolvers = {
       };
     },
     register: async (parent, args) => {
-      const { password, email, name, surname } = args.registerCredentials;
+      const {
+        password,
+        data: {
+          name,
+          surname,
+          email,
+          phone,
+          street,
+          streetNumber,
+          postalCode,
+          city,
+        },
+      } = args.registerCredentials;
 
-      const isEmailOk = emailSchema.isValidSync(args.registerCredentials.email);
+      const isEmailOk = emailSchema.isValidSync(
+        args.registerCredentials.data.email
+      );
 
-      if (!args.registerCredentials.email || !isEmailOk) {
+      if (!args.registerCredentials.data.email || !isEmailOk) {
         // returnning here new error works only becasue GraphQLError has a field `message` and at the same time `SuccessfulReqMsg` type also has `message` member
         return new GraphQLError(AUTH_MESSAGES.INVALID_EMAIL, {
           extensions: {
@@ -121,9 +153,14 @@ const authResolvers: Resolvers = {
           password: hashedPassword,
 
           data: {
-            email,
             name,
             surname,
+            email,
+            phone,
+            street,
+            streetNumber,
+            postalCode,
+            city,
           },
         });
 
@@ -167,15 +204,66 @@ const authResolvers: Resolvers = {
         }
       }
     },
-    someProtectedMutation(parent, args, context, info) {
-      const { age } = args.data;
-      console.log({ someProtectedMutation_context: context });
-
+    updateUserData: async (parent, args, context) => {
       checkAuthentication(context.user);
 
-      return {
-        message: `lat: ${age}`,
-      };
+      const result = await UserModel.findOne({
+        _id: context.user?._id,
+      }).exec();
+
+      if (!result) {
+        throw new GraphQLError(COMMON_MESSAGES.NOT_FOUND_FN("użytkownika"));
+      }
+
+      try {
+        await result
+          .updateOne({
+            data: {
+              ...result.data,
+              ...args.data,
+            },
+          })
+          .exec();
+
+        return {
+          message: AUTH_MESSAGES.ACCOUNT_UPDATED,
+        };
+      } catch (error) {
+        throw new GraphQLError(COMMON_MESSAGES.AN_ERROR_OCCURED);
+      }
+    },
+    updateUserPassword: async (parent, args, context) => {
+      checkAuthentication(context.user);
+
+      const { newPassword, oldPassword } = args.newPasswordInput;
+
+      const result = await UserModel.findOne({
+        _id: context.user?._id,
+      }).exec();
+
+      if (!result) {
+        throw new GraphQLError(COMMON_MESSAGES.NOT_FOUND_FN("użytkownika"));
+      }
+      const isMatching = bcryptjs.compareSync(oldPassword, result.password);
+
+      if (!isMatching) {
+        throw new GraphQLError(AUTH_MESSAGES.WRONG_OLD_PASSWORD);
+      }
+
+      const hashedPassword = await bcryptjs.hash(newPassword, 10);
+      try {
+        await result
+          .updateOne({
+            password: hashedPassword,
+          })
+          .exec();
+
+        return {
+          message: AUTH_MESSAGES.ACCOUNT_UPDATED,
+        };
+      } catch (error) {
+        throw new GraphQLError(COMMON_MESSAGES.AN_ERROR_OCCURED);
+      }
     },
   },
 };
