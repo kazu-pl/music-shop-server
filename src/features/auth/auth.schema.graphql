@@ -2,11 +2,6 @@ type SuccessfulReqMsg {
   message: String!
 }
 
-type Book {
-  title: String
-  author: String
-}
-
 type Tokens {
   """
   Description for field
@@ -26,23 +21,51 @@ input LoginCredentialsInput {
   password: String!
 }
 
-input RegisterCredentialsInput {
-  email: String!
-  password: String!
+input User {
   name: String!
   surname: String!
+  email: String!
+  phone: Int!
+  street: String!
+  streetNumber: String!
+  postalCode: String!
+  city: String!
+}
+
+type UserType {
+  name: String!
+  surname: String!
+  email: String!
+  phone: Int!
+  street: String!
+  streetNumber: String!
+  postalCode: String!
+  city: String!
+}
+
+input RegisterCredentialsInput {
+  data: User!
+  password: String!
 }
 
 input RefreshTokenInput {
   refreshToken: String!
 }
 
-type Query {
-  books: [Book]
+input newPasswordInput {
+  oldPassword: String!
+  newPassword: String!
 }
 
-input ProtectedInput {
-  age: Int!
+type Query {
+  """
+  **PROTECTED**
+  """
+  getUserData: UserType!
+  """
+  **PROTECTED**
+  """
+  removeUser: SuccessfulReqMsg!
 }
 
 type Mutation {
@@ -57,13 +80,12 @@ type Mutation {
 
   "use this to get new accessToken if yours expired. Pass refreshToken to obtain accessToken"
   renewAccessToken(refreshCredentials: RefreshTokenInput!): AccessTokenResponse!
-
   """
   **PROTECTED**
-
-  Description for field
-
-  Supports **multi-line** description for your [API](http://example.com)!
   """
-  someProtectedMutation(data: ProtectedInput!): SuccessfulReqMsg!
+  updateUserData(data: User!): SuccessfulReqMsg!
+  """
+  **PROTECTED**
+  """
+  updateUserPassword(newPasswordInput: newPasswordInput!): SuccessfulReqMsg!
 }
