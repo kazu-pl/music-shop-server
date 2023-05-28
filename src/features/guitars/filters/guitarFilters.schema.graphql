@@ -1,0 +1,50 @@
+input GuitarProducentInput {
+  name: String!
+  description: String!
+}
+input UpdateGuitarProducentInput {
+  id: ID!
+  name: String!
+  description: String!
+}
+
+type GuitarProducent {
+  id: ID!
+  name: String!
+  description: String!
+}
+
+type GetGuitarProducentsRes {
+  data: [GuitarProducent!]!
+  totalItems: Int!
+}
+
+type Query {
+  getGuitarProducents(offset: Int, limit: Int): GetGuitarProducentsRes!
+  """
+  **PROTECTED**
+  **ONLY FOR ADMIN**
+  """
+  getGuitarProducent(id: ID!): GuitarProducent!
+  """
+  **PROTECTED**
+  **ONLY FOR ADMIN**
+  """
+  removeGuitarProducent(id: ID!): SuccessfulReqMsg!
+}
+
+type Mutation {
+  """
+  **PROTECTED**
+  **ONLY FOR ADMIN**
+  """
+  addGuitarProducent(producentData: GuitarProducentInput!): SuccessfulReqMsg!
+
+  """
+  **PROTECTED**
+  **ONLY FOR ADMIN**
+  """
+  updateGuitarProducent(
+    producentData: UpdateGuitarProducentInput!
+  ): SuccessfulReqMsg!
+}

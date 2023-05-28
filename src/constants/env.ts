@@ -16,4 +16,4 @@ export const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET as string;
 export const RENEW_PASSWORD_EXPIRATION_TIME_IN_SECONDS = (process.env
   .RENEW_PASSWORD_EXPIRATION_TIME_IN_SECONDS || 300) as number;
 
-export const ADMIN_ID = process.env.ADMIN_ID || "";
+export const ADMIN_ACCOUNT_ID = process.env.ADMIN_ACCOUNT_ID || "";

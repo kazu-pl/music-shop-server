@@ -1,9 +1,9 @@
 import { ApolloServerErrorCode } from "@apollo/server/errors";
-import UserModel from "features/auth/User.model";
+import UserModel from "features/auth/models/User.model";
 import { GraphQLError } from "graphql";
 import bcryptjs from "bcryptjs";
 import { Resolvers } from "types/graphql.types";
-import AUTH_MESSAGES from "./AUTH_MESSAGES";
+import AUTH_MESSAGES from "constants/AUTH_MESSAGES";
 import COMMON_MESSAGES from "constants/COMMON_MESSAGES";
 import { string } from "yup";
 import jwt, { TokenExpiredError } from "jsonwebtoken";
@@ -14,7 +14,7 @@ import {
   REFRESH_TOKEN_SECRET,
 } from "constants/env";
 import { DecodedUser } from "types/jwt.types";
-import checkAuthentication from "./utils/checkAuthentication";
+import checkAuthentication from "../../utils/checkAuthentication";
 
 const emailSchema = string().email();
 

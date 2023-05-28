@@ -3,7 +3,12 @@ import type { CodegenConfig } from "@graphql-codegen/cli";
 const config: CodegenConfig = {
   overwrite: true,
   // schema: "http://localhost:4000", // it will work of course
-  schema: "./src/features/auth/auth.schema.graphql", // use if you want to have whole schema in one single file
+  // schema: "./src/features/auth/auth.schema.graphql", // use if you want to have whole schema in one single file
+  schema: [
+    "./src/common/schema.common.graphql",
+    "./src/features/auth/auth.schema.graphql",
+    "./src/features/guitars/filters/guitarFilters.schema.graphql",
+  ],
   // schema: "./src/schema-graphql.ts", // it does not work?
   // schema: [
   //   "./src/common.graphql",
