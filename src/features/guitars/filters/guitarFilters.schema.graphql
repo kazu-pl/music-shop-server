@@ -1,92 +1,78 @@
-# =================== GuitarProducent ===============================
-input AddGuitarProducentInput {
-  name: String!
-  description: String!
-}
-input UpdateGuitarProducentInput {
-  id: ID!
-  name: String!
-  description: String!
-}
-
-type GuitarProducent {
-  id: ID!
-  name: String!
-  description: String!
+enum GuitarFilterTypeEnum {
+  AVAILABILITY
+  BODY_WOOD
+  BRIDGE
+  FINGERBOARD_WOOD
+  GUITAR_TYPE
+  PICKUPS_SET
+  PRODUCER
+  SHAPE
 }
 
-type GetGuitarProducentsRes {
-  data: [GuitarProducent!]!
+type GuitarFilter {
+  id: ID!
+  name: String!
+  description: String
+  type: GuitarFilterTypeEnum!
+}
+
+type GuitarFiltersList {
+  data: [GuitarFilter!]!
   totalItems: Int!
 }
-# =================== GuitarShape ===============================
-input AddGuitarShapeInput {
+
+input AddGuitarFilterInput {
   name: String!
-}
-input UpdateGuitarShapeInput {
-  id: ID!
-  name: String!
+  description: String
+  type: GuitarFilterTypeEnum!
 }
 
-type GuitarShape {
+input UpdateGuitarFilterInput {
   id: ID!
   name: String!
+  description: String!
+  type: GuitarFilterTypeEnum!
 }
 
-type GetGuitarShapesRes {
-  data: [GuitarShape!]!
-  totalItems: Int!
-}
 type Query {
-  # ====== GuitarProducent ==============================================
-  getGuitarProducents(offset: Int, limit: Int): GetGuitarProducentsRes!
   """
   **PROTECTED**
+  -
   **ONLY FOR ADMIN**
   """
-  getGuitarProducent(id: ID!): GuitarProducent!
+  getGuitarFilters(
+    offset: Int
+    limit: Int
+    type: GuitarFilterTypeEnum!
+  ): GuitarFiltersList!
+
   """
   **PROTECTED**
+  -
   **ONLY FOR ADMIN**
   """
-  removeGuitarProducent(id: ID!): SuccessfulReqMsg!
-  # ====== GuitarShape -================================================
-  getGuitarShapes(offset: Int, limit: Int): GetGuitarShapesRes!
-  """
-  **PROTECTED**
-  **ONLY FOR ADMIN**
-  """
-  getGuitarShape(id: ID!): GuitarShape!
-  """
-  **PROTECTED**
-  **ONLY FOR ADMIN**
-  """
-  removeGuitarShape(id: ID!): SuccessfulReqMsg!
+  getGuitarFilter(id: ID!): GuitarFilter!
 }
 
 type Mutation {
   """
   **PROTECTED**
+  -
   **ONLY FOR ADMIN**
   """
-  addGuitarProducent(producentData: AddGuitarProducentInput!): SuccessfulReqMsg!
+  addGuitarFilter(newGuitarFilter: AddGuitarFilterInput!): SuccessfulReqMsg!
 
   """
   **PROTECTED**
+  -
   **ONLY FOR ADMIN**
   """
-  updateGuitarProducent(
-    producentData: UpdateGuitarProducentInput!
-  ): SuccessfulReqMsg!
-  """
-  **PROTECTED**
-  **ONLY FOR ADMIN**
-  """
-  addGuitarShape(newGuitarShape: AddGuitarShapeInput!): SuccessfulReqMsg!
+  updateGuitarFilter(guitarFilter: UpdateGuitarFilterInput!): SuccessfulReqMsg!
 
   """
   **PROTECTED**
+  -
   **ONLY FOR ADMIN**
   """
-  updateGuitarShape(guitarShapeData: UpdateGuitarShapeInput!): SuccessfulReqMsg!
+  removeGuitarFilter(id: ID!): SuccessfulReqMsg!
 }
