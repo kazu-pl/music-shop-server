@@ -1,4 +1,5 @@
-input GuitarProducentInput {
+# =================== GuitarProducent ===============================
+input AddGuitarProducentInput {
   name: String!
   description: String!
 }
@@ -18,8 +19,26 @@ type GetGuitarProducentsRes {
   data: [GuitarProducent!]!
   totalItems: Int!
 }
+# =================== GuitarShape ===============================
+input AddGuitarShapeInput {
+  name: String!
+}
+input UpdateGuitarShapeInput {
+  id: ID!
+  name: String!
+}
 
+type GuitarShape {
+  id: ID!
+  name: String!
+}
+
+type GetGuitarShapesRes {
+  data: [GuitarShape!]!
+  totalItems: Int!
+}
 type Query {
+  # ====== GuitarProducent ==============================================
   getGuitarProducents(offset: Int, limit: Int): GetGuitarProducentsRes!
   """
   **PROTECTED**
@@ -31,6 +50,18 @@ type Query {
   **ONLY FOR ADMIN**
   """
   removeGuitarProducent(id: ID!): SuccessfulReqMsg!
+  # ====== GuitarShape -================================================
+  getGuitarShapes(offset: Int, limit: Int): GetGuitarShapesRes!
+  """
+  **PROTECTED**
+  **ONLY FOR ADMIN**
+  """
+  getGuitarShape(id: ID!): GuitarShape!
+  """
+  **PROTECTED**
+  **ONLY FOR ADMIN**
+  """
+  removeGuitarShape(id: ID!): SuccessfulReqMsg!
 }
 
 type Mutation {
@@ -38,7 +69,7 @@ type Mutation {
   **PROTECTED**
   **ONLY FOR ADMIN**
   """
-  addGuitarProducent(producentData: GuitarProducentInput!): SuccessfulReqMsg!
+  addGuitarProducent(producentData: AddGuitarProducentInput!): SuccessfulReqMsg!
 
   """
   **PROTECTED**
@@ -47,4 +78,15 @@ type Mutation {
   updateGuitarProducent(
     producentData: UpdateGuitarProducentInput!
   ): SuccessfulReqMsg!
+  """
+  **PROTECTED**
+  **ONLY FOR ADMIN**
+  """
+  addGuitarShape(newGuitarShape: AddGuitarShapeInput!): SuccessfulReqMsg!
+
+  """
+  **PROTECTED**
+  **ONLY FOR ADMIN**
+  """
+  updateGuitarShape(guitarShapeData: UpdateGuitarShapeInput!): SuccessfulReqMsg!
 }

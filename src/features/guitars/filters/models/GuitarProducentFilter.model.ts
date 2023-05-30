@@ -15,9 +15,9 @@ const GuitarProducentSchema: Schema = new Schema(
   }
 );
 
-const GuitarProducentModel = mongoose.model<GuitarProducent>(
+const GuitarProducentFilter = mongoose.model<GuitarProducent>(
   "GuitarProducent",
   GuitarProducentSchema
 );
 
-export default GuitarProducentModel;
+export default GuitarProducentFilter;
