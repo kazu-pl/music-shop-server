@@ -9,6 +9,7 @@ const AUTH_MESSAGES = {
   WRONG_OLD_PASSWORD: "Podano nieprawidłowe dotychczasowwe hasło",
   SESSION_ENDED: "Sesja wygasła",
   UNAUTHENTICATED: "Najpierw musisz się zalogować",
+  ONLY_ADMIN_ALLOWED: "Ta akcja dostepna jest jedynie dla administratora",
   FORBIDEN: "Nie masz wystarczających uprawień",
 };
 

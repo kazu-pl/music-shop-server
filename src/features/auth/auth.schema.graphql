@@ -1,7 +1,3 @@
-type SuccessfulReqMsg {
-  message: String!
-}
-
 type Tokens {
   """
   Description for field

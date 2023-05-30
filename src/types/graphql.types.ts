@@ -21,6 +21,37 @@ export type AccessTokenResponse = {
   accessToken: Scalars['String'];
 };
 
+export type AddGuitarFilterInput = {
+  description?: InputMaybe<Scalars['String']>;
+  name: Scalars['String'];
+  type: GuitarFilterTypeEnum;
+};
+
+export type GuitarFilter = {
+  __typename?: 'GuitarFilter';
+  description?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  type: GuitarFilterTypeEnum;
+};
+
+export enum GuitarFilterTypeEnum {
+  Availability = 'AVAILABILITY',
+  BodyWood = 'BODY_WOOD',
+  Bridge = 'BRIDGE',
+  FingerboardWood = 'FINGERBOARD_WOOD',
+  GuitarType = 'GUITAR_TYPE',
+  PickupsSet = 'PICKUPS_SET',
+  Producer = 'PRODUCER',
+  Shape = 'SHAPE'
+}
+
+export type GuitarFiltersList = {
+  __typename?: 'GuitarFiltersList';
+  data: Array<GuitarFilter>;
+  totalItems: Scalars['Int'];
+};
+
 export type LoginCredentialsInput = {
   email: Scalars['String'];
   password: Scalars['String'];
@@ -28,6 +59,12 @@ export type LoginCredentialsInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  /**
+   * **PROTECTED**
+   * -
+   * **ONLY FOR ADMIN**
+   */
+  addGuitarFilter: SuccessfulReqMsg;
   /** use this mutation to send email and password and get JWT tokens */
   login: Tokens;
   /**
@@ -35,12 +72,29 @@ export type Mutation = {
    * Supports **multi-line** description for your [API](http://example.com)!
    */
   register: SuccessfulReqMsg;
+  /**
+   * **PROTECTED**
+   * -
+   * **ONLY FOR ADMIN**
+   */
+  removeGuitarFilter: SuccessfulReqMsg;
   /** use this to get new accessToken if yours expired. Pass refreshToken to obtain accessToken */
   renewAccessToken: AccessTokenResponse;
+  /**
+   * **PROTECTED**
+   * -
+   * **ONLY FOR ADMIN**
+   */
+  updateGuitarFilter: SuccessfulReqMsg;
   /** **PROTECTED** */
   updateUserData: SuccessfulReqMsg;
   /** **PROTECTED** */
   updateUserPassword: SuccessfulReqMsg;
+};
+
+
+export type MutationAddGuitarFilterArgs = {
+  newGuitarFilter: AddGuitarFilterInput;
 };
 
 
@@ -54,8 +108,18 @@ export type MutationRegisterArgs = {
 };
 
 
+export type MutationRemoveGuitarFilterArgs = {
+  id: Scalars['ID'];
+};
+
+
 export type MutationRenewAccessTokenArgs = {
   refreshCredentials: RefreshTokenInput;
+};
+
+
+export type MutationUpdateGuitarFilterArgs = {
+  guitarFilter: UpdateGuitarFilterInput;
 };
 
 
@@ -70,10 +134,34 @@ export type MutationUpdateUserPasswordArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  /**
+   * **PROTECTED**
+   * -
+   * **ONLY FOR ADMIN**
+   */
+  getGuitarFilter: GuitarFilter;
+  /**
+   * **PROTECTED**
+   * -
+   * **ONLY FOR ADMIN**
+   */
+  getGuitarFilters: GuitarFiltersList;
   /** **PROTECTED** */
   getUserData: UserType;
   /** **PROTECTED** */
   removeUser: SuccessfulReqMsg;
+};
+
+
+export type QueryGetGuitarFilterArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryGetGuitarFiltersArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  type: GuitarFilterTypeEnum;
 };
 
 export type RefreshTokenInput = {
@@ -99,6 +187,13 @@ export type Tokens = {
   accessToken: Scalars['String'];
   /** Description for argument */
   refreshToken: Scalars['String'];
+};
+
+export type UpdateGuitarFilterInput = {
+  description: Scalars['String'];
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  type: GuitarFilterTypeEnum;
 };
 
 export type User = {
@@ -201,7 +296,12 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   AccessTokenResponse: ResolverTypeWrapper<AccessTokenResponse>;
+  AddGuitarFilterInput: AddGuitarFilterInput;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  GuitarFilter: ResolverTypeWrapper<GuitarFilter>;
+  GuitarFilterTypeEnum: GuitarFilterTypeEnum;
+  GuitarFiltersList: ResolverTypeWrapper<GuitarFiltersList>;
+  ID: ResolverTypeWrapper<Scalars['ID']>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   LoginCredentialsInput: LoginCredentialsInput;
   Mutation: ResolverTypeWrapper<{}>;
@@ -211,6 +311,7 @@ export type ResolversTypes = {
   String: ResolverTypeWrapper<Scalars['String']>;
   SuccessfulReqMsg: ResolverTypeWrapper<SuccessfulReqMsg>;
   Tokens: ResolverTypeWrapper<Tokens>;
+  UpdateGuitarFilterInput: UpdateGuitarFilterInput;
   User: User;
   UserType: ResolverTypeWrapper<UserType>;
   newPasswordInput: NewPasswordInput;
@@ -219,7 +320,11 @@ export type ResolversTypes = {
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   AccessTokenResponse: AccessTokenResponse;
+  AddGuitarFilterInput: AddGuitarFilterInput;
   Boolean: Scalars['Boolean'];
+  GuitarFilter: GuitarFilter;
+  GuitarFiltersList: GuitarFiltersList;
+  ID: Scalars['ID'];
   Int: Scalars['Int'];
   LoginCredentialsInput: LoginCredentialsInput;
   Mutation: {};
@@ -229,6 +334,7 @@ export type ResolversParentTypes = {
   String: Scalars['String'];
   SuccessfulReqMsg: SuccessfulReqMsg;
   Tokens: Tokens;
+  UpdateGuitarFilterInput: UpdateGuitarFilterInput;
   User: User;
   UserType: UserType;
   newPasswordInput: NewPasswordInput;
@@ -239,15 +345,34 @@ export type AccessTokenResponseResolvers<ContextType = Context, ParentType exten
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type GuitarFilterResolvers<ContextType = Context, ParentType extends ResolversParentTypes['GuitarFilter'] = ResolversParentTypes['GuitarFilter']> = {
+  description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  type?: Resolver<ResolversTypes['GuitarFilterTypeEnum'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type GuitarFiltersListResolvers<ContextType = Context, ParentType extends ResolversParentTypes['GuitarFiltersList'] = ResolversParentTypes['GuitarFiltersList']> = {
+  data?: Resolver<Array<ResolversTypes['GuitarFilter']>, ParentType, ContextType>;
+  totalItems?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  addGuitarFilter?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationAddGuitarFilterArgs, 'newGuitarFilter'>>;
   login?: Resolver<ResolversTypes['Tokens'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'loginCredentials'>>;
   register?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'registerCredentials'>>;
+  removeGuitarFilter?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationRemoveGuitarFilterArgs, 'id'>>;
   renewAccessToken?: Resolver<ResolversTypes['AccessTokenResponse'], ParentType, ContextType, RequireFields<MutationRenewAccessTokenArgs, 'refreshCredentials'>>;
+  updateGuitarFilter?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationUpdateGuitarFilterArgs, 'guitarFilter'>>;
   updateUserData?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationUpdateUserDataArgs, 'data'>>;
   updateUserPassword?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationUpdateUserPasswordArgs, 'newPasswordInput'>>;
 };
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  getGuitarFilter?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType, RequireFields<QueryGetGuitarFilterArgs, 'id'>>;
+  getGuitarFilters?: Resolver<ResolversTypes['GuitarFiltersList'], ParentType, ContextType, RequireFields<QueryGetGuitarFiltersArgs, 'type'>>;
   getUserData?: Resolver<ResolversTypes['UserType'], ParentType, ContextType>;
   removeUser?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType>;
 };
@@ -277,6 +402,8 @@ export type UserTypeResolvers<ContextType = Context, ParentType extends Resolver
 
 export type Resolvers<ContextType = Context> = {
   AccessTokenResponse?: AccessTokenResponseResolvers<ContextType>;
+  GuitarFilter?: GuitarFilterResolvers<ContextType>;
+  GuitarFiltersList?: GuitarFiltersListResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   SuccessfulReqMsg?: SuccessfulReqMsgResolvers<ContextType>;

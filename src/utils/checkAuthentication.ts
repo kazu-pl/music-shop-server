@@ -1,6 +1,6 @@
 import { DecodedUser } from "types/jwt.types";
 import { GraphQLError } from "graphql";
-import AUTH_MESSAGES from "features/auth/AUTH_MESSAGES";
+import AUTH_MESSAGES from "constants/AUTH_MESSAGES";
 
 const checkAuthentication = (
   user: DecodedUser | null

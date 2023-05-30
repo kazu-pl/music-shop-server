@@ -1,3 +1,28 @@
+# Error `Cannot return null for non-nullable field Mutation.addGuitarProducent.`
+
+If you have that error it means you used some mutation (you can use it because it exists in schema) but you forgot to add that its resolver to resolvers map.
+
+```ts
+// src/resolvers.ts
+import { Resolvers } from "types/graphql.types";
+import authResolvers from "features/auth/auth.resolvers";
+
+const resolvers: Resolvers = {
+  ...authResolvers,
+
+  Query: {
+    ...authResolvers.Query,
+  },
+
+  Mutation: {
+    ...authResolvers.Mutation,
+    // ADD MISSING RESOLVERS HERE
+  },
+};
+
+export default resolvers;
+```
+
 # How to make JWT auth and protect some actions and not all:
 
 You can return context object in context and verify jwt token in try/catch so when something bad happens (like token was not provided or expired or is incorrect or whatever) the `jwt.verify()` function will thrown an error which can be catched in `catch` block and in that case you can return `null` as value of `user` key of context. Later on in every protected action you can check if the `user` object exists on context and if not - it means something bad happend and you can thrown an GraphQLError.
