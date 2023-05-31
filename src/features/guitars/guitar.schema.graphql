@@ -56,13 +56,29 @@ input UpdateGuitarInput {
   guitarTypeId: String!
 }
 
+enum SortByKeys {
+  NAME
+  PRICE
+  DEFAULT
+  LATEST
+}
+enum SortOrder {
+  ASC
+  DESC
+}
+
+input GetGuitarsSortInput {
+  sortBy: SortByKeys!
+  sortOrder: SortOrder
+}
+
 type Query {
   """
   **PROTECTED**
   -
   **ONLY FOR ADMIN**
   """
-  getGuitars(offset: Int, limit: Int): GuitarsList!
+  getGuitars(offset: Int, limit: Int, sort: GetGuitarsSortInput!): GuitarsList!
 
   """
   **PROTECTED**

@@ -44,6 +44,11 @@ export type AddGuitarInput = {
   stringsNumber: Scalars['Int'];
 };
 
+export type GetGuitarsSortInput = {
+  sortBy: SortByKeys;
+  sortOrder?: InputMaybe<SortOrder>;
+};
+
 export type Guitar = {
   __typename?: 'Guitar';
   _id: Scalars['ID'];
@@ -260,6 +265,7 @@ export type QueryGetGuitarFiltersArgs = {
 export type QueryGetGuitarsArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
+  sort: GetGuitarsSortInput;
 };
 
 export type RefreshTokenInput = {
@@ -270,6 +276,23 @@ export type RegisterCredentialsInput = {
   data: User;
   password: Scalars['String'];
 };
+
+export enum SortByGeneral {
+  Default = 'DEFAULT',
+  Latest = 'LATEST'
+}
+
+export enum SortByKeys {
+  Default = 'DEFAULT',
+  Latest = 'LATEST',
+  Name = 'NAME',
+  Price = 'PRICE'
+}
+
+export enum SortOrder {
+  Asc = 'ASC',
+  Desc = 'DESC'
+}
 
 export type SuccessfulReqMsg = {
   __typename?: 'SuccessfulReqMsg';
@@ -416,6 +439,7 @@ export type ResolversTypes = {
   AddGuitarInput: AddGuitarInput;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Float: ResolverTypeWrapper<Scalars['Float']>;
+  GetGuitarsSortInput: GetGuitarsSortInput;
   Guitar: ResolverTypeWrapper<Guitar>;
   GuitarFilter: ResolverTypeWrapper<GuitarFilter>;
   GuitarFilterTypeEnum: GuitarFilterTypeEnum;
@@ -428,6 +452,9 @@ export type ResolversTypes = {
   Query: ResolverTypeWrapper<{}>;
   RefreshTokenInput: RefreshTokenInput;
   RegisterCredentialsInput: RegisterCredentialsInput;
+  SortByGeneral: SortByGeneral;
+  SortByKeys: SortByKeys;
+  SortOrder: SortOrder;
   String: ResolverTypeWrapper<Scalars['String']>;
   SuccessfulReqMsg: ResolverTypeWrapper<SuccessfulReqMsg>;
   Tokens: ResolverTypeWrapper<Tokens>;
@@ -445,6 +472,7 @@ export type ResolversParentTypes = {
   AddGuitarInput: AddGuitarInput;
   Boolean: Scalars['Boolean'];
   Float: Scalars['Float'];
+  GetGuitarsSortInput: GetGuitarsSortInput;
   Guitar: Guitar;
   GuitarFilter: GuitarFilter;
   GuitarFiltersList: GuitarFiltersList;
@@ -528,7 +556,7 @@ export type QueryResolvers<ContextType = Context, ParentType extends ResolversPa
   getGuitar?: Resolver<ResolversTypes['Guitar'], ParentType, ContextType, RequireFields<QueryGetGuitarArgs, 'id'>>;
   getGuitarFilter?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType, RequireFields<QueryGetGuitarFilterArgs, 'id'>>;
   getGuitarFilters?: Resolver<ResolversTypes['GuitarFiltersList'], ParentType, ContextType, RequireFields<QueryGetGuitarFiltersArgs, 'type'>>;
-  getGuitars?: Resolver<ResolversTypes['GuitarsList'], ParentType, ContextType, Partial<QueryGetGuitarsArgs>>;
+  getGuitars?: Resolver<ResolversTypes['GuitarsList'], ParentType, ContextType, RequireFields<QueryGetGuitarsArgs, 'sort'>>;
   getUserData?: Resolver<ResolversTypes['UserType'], ParentType, ContextType>;
   removeUser?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType>;
 };

@@ -1,11 +1,13 @@
 import { GraphQLError } from "graphql";
-import { Resolvers, Guitar } from "types/graphql.types";
+import { Resolvers, Guitar, SortByKeys } from "types/graphql.types";
 import COMMON_MESSAGES from "constants/COMMON_MESSAGES";
 import checkAuthentication from "utils/auth/checkAuthentication";
 import allowOnlyAdmin from "utils/auth/allowOnlyAdmin";
 import GuitarModel from "./Guitar.model";
 import getErrorMessage from "utils/getErrorMessage";
 import getGuitarModelFieldForResolver from "./utils/getGuitarModelFieldForResolver";
+import getSortBy from "utils/db/getSortBy";
+import getSortOrder from "utils/db/getSortOrder";
 
 const guitarResolvers: Resolvers = {
   Guitar: {
@@ -36,18 +38,21 @@ const guitarResolvers: Resolvers = {
   },
   Query: {
     getGuitars: async (parent, args) => {
-      const { limit = 5, offset = 0 } = args;
+      const { limit = 5, offset = 0, sort } = args;
 
       // eslint-disable-next-line no-console
       console.log(
         `SELECT Guitars list, with limit: ${limit}, offset: ${offset}`
       );
 
+      const sortBy = getSortBy(sort.sortBy);
+      const sortOrder = getSortOrder(sort.sortOrder);
+
       const [data, totalItems] = await Promise.all([
         GuitarModel.find()
           .skip(offset as number)
           .limit(limit as number)
-          .sort({ name: 1 }),
+          .sort({ [sortBy]: sortOrder }), // 1 for asc, -1 for desc
         GuitarModel.countDocuments(),
       ]);
 
