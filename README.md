@@ -1,3 +1,26 @@
+# How to get rid of error `Do not use "@ts-ignore" because it alters compilation errors.` and be able to use `@ts-ignore` comment:
+
+This error is related to the bellow comments:
+
+```ts
+// @ts-expect-error
+// @ts-ignore
+// @ts-nocheck
+// @ts-check
+```
+
+and to allow to use it you can override it via:
+
+```json
+{
+  "rules": {
+    "@typescript-eslint/ban-ts-comment": "error"
+  }
+}
+```
+
+found [here](https://typescript-eslint.io/rules/ban-ts-comment/)
+
 # Error `Cannot return null for non-nullable field Mutation.addGuitarProducent.`
 
 If you have that error it means you used some mutation (you can use it because it exists in schema) but you forgot to add that its resolver to resolvers map.

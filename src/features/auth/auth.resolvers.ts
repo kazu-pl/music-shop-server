@@ -14,7 +14,7 @@ import {
   REFRESH_TOKEN_SECRET,
 } from "constants/env";
 import { DecodedUser } from "types/jwt.types";
-import checkAuthentication from "../../utils/checkAuthentication";
+import checkAuthentication from "../../utils/auth/checkAuthentication";
 
 const emailSchema = string().email();
 

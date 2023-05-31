@@ -10,7 +10,7 @@ enum GuitarFilterTypeEnum {
 }
 
 type GuitarFilter {
-  id: ID!
+  _id: ID!
   name: String!
   description: String
   type: GuitarFilterTypeEnum!

@@ -1,0 +1,96 @@
+type Guitar {
+  _id: ID!
+  name: String!
+  description: String!
+  price: Int!
+  stringsNumber: Int!
+  scaleLength: Float!
+  fretsNumber: Int!
+  producer: GuitarFilter!
+  availability: GuitarFilter!
+  bodyWood: GuitarFilter!
+  bridge: GuitarFilter!
+  fingerboardWood: GuitarFilter!
+  pickupsSet: GuitarFilter!
+  shape: GuitarFilter!
+  guitarType: GuitarFilter!
+}
+
+type GuitarsList {
+  data: [Guitar!]!
+  totalItems: Int!
+}
+
+input AddGuitarInput {
+  name: String!
+  description: String!
+  price: Int!
+  stringsNumber: Int!
+  scaleLength: Float!
+  fretsNumber: Int!
+  producerId: String!
+  availabilityId: String!
+  bodyWoodId: String!
+  bridgeId: String!
+  fingerboardWoodId: String!
+  pickupsSetId: String!
+  shapeId: String!
+  guitarTypeId: String!
+}
+
+input UpdateGuitarInput {
+  id: ID!
+  name: String!
+  description: String!
+  price: Int!
+  stringsNumber: Int!
+  scaleLength: Float!
+  fretsNumber: Int!
+  producerId: String!
+  availabilityId: String!
+  bodyWoodId: String!
+  bridgeId: String!
+  fingerboardWoodId: String!
+  pickupsSetId: String!
+  shapeId: String!
+  guitarTypeId: String!
+}
+
+type Query {
+  """
+  **PROTECTED**
+  -
+  **ONLY FOR ADMIN**
+  """
+  getGuitars(offset: Int, limit: Int): GuitarsList!
+
+  """
+  **PROTECTED**
+  -
+  **ONLY FOR ADMIN**
+  """
+  getGuitar(id: ID!): Guitar!
+}
+
+type Mutation {
+  """
+  **PROTECTED**
+  -
+  **ONLY FOR ADMIN**
+  """
+  addGuitar(newGuitar: AddGuitarInput!): SuccessfulReqMsg!
+
+  """
+  **PROTECTED**
+  -
+  **ONLY FOR ADMIN**
+  """
+  updateGuitar(guitar: UpdateGuitarInput!): SuccessfulReqMsg!
+
+  """
+  **PROTECTED**
+  -
+  **ONLY FOR ADMIN**
+  """
+  removeGuitar(id: ID!): SuccessfulReqMsg!
+}

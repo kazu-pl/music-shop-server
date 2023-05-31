@@ -8,9 +8,13 @@ const guitarFiltersSchema = join(
   __dirname,
   "./features/guitars/filters/guitarFilters.schema.graphql"
 );
+const guitarSchema = join(
+  __dirname,
+  "./features/guitars/guitar.schema.graphql"
+);
 
 const typeDefs = loadSchemaSync(
-  [commonSchema, authSchema, guitarFiltersSchema],
+  [commonSchema, authSchema, guitarFiltersSchema, guitarSchema],
   {
     loaders: [new GraphQLFileLoader()],
   }
