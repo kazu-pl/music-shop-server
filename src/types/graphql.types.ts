@@ -44,6 +44,27 @@ export type AddGuitarInput = {
   stringsNumber: Scalars['Int'];
 };
 
+export type GetGuitarsFilters = {
+  /** Id of availability */
+  availability?: InputMaybe<Scalars['ID']>;
+  /** Id of bodyWood */
+  bodyWood?: InputMaybe<Scalars['ID']>;
+  /** Id of bridge */
+  bridge?: InputMaybe<Scalars['ID']>;
+  /** Id of fingerboardWood */
+  fingerboardWood?: InputMaybe<Scalars['ID']>;
+  /** Id of guitarType */
+  guitarType?: InputMaybe<Scalars['ID']>;
+  /** Id of pickupsSet */
+  pickupsSet?: InputMaybe<Scalars['ID']>;
+  price?: InputMaybe<PriceRange>;
+  /** Id of producer */
+  producer?: InputMaybe<Scalars['ID']>;
+  /** Id of shape */
+  shape?: InputMaybe<Scalars['ID']>;
+  stringsNumber?: InputMaybe<Scalars['Int']>;
+};
+
 export type GetGuitarsSortInput = {
   sortBy: SortByKeys;
   sortOrder?: InputMaybe<SortOrder>;
@@ -212,6 +233,11 @@ export type MutationUpdateUserPasswordArgs = {
   newPasswordInput: NewPasswordInput;
 };
 
+export type PriceRange = {
+  from: Scalars['Int'];
+  to: Scalars['Int'];
+};
+
 export type Query = {
   __typename?: 'Query';
   /**
@@ -263,6 +289,7 @@ export type QueryGetGuitarFiltersArgs = {
 
 
 export type QueryGetGuitarsArgs = {
+  filters?: InputMaybe<GetGuitarsFilters>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
   sort: GetGuitarsSortInput;
@@ -439,6 +466,7 @@ export type ResolversTypes = {
   AddGuitarInput: AddGuitarInput;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Float: ResolverTypeWrapper<Scalars['Float']>;
+  GetGuitarsFilters: GetGuitarsFilters;
   GetGuitarsSortInput: GetGuitarsSortInput;
   Guitar: ResolverTypeWrapper<Guitar>;
   GuitarFilter: ResolverTypeWrapper<GuitarFilter>;
@@ -449,6 +477,7 @@ export type ResolversTypes = {
   Int: ResolverTypeWrapper<Scalars['Int']>;
   LoginCredentialsInput: LoginCredentialsInput;
   Mutation: ResolverTypeWrapper<{}>;
+  PriceRange: PriceRange;
   Query: ResolverTypeWrapper<{}>;
   RefreshTokenInput: RefreshTokenInput;
   RegisterCredentialsInput: RegisterCredentialsInput;
@@ -472,6 +501,7 @@ export type ResolversParentTypes = {
   AddGuitarInput: AddGuitarInput;
   Boolean: Scalars['Boolean'];
   Float: Scalars['Float'];
+  GetGuitarsFilters: GetGuitarsFilters;
   GetGuitarsSortInput: GetGuitarsSortInput;
   Guitar: Guitar;
   GuitarFilter: GuitarFilter;
@@ -481,6 +511,7 @@ export type ResolversParentTypes = {
   Int: Scalars['Int'];
   LoginCredentialsInput: LoginCredentialsInput;
   Mutation: {};
+  PriceRange: PriceRange;
   Query: {};
   RefreshTokenInput: RefreshTokenInput;
   RegisterCredentialsInput: RegisterCredentialsInput;

@@ -72,13 +72,60 @@ input GetGuitarsSortInput {
   sortOrder: SortOrder
 }
 
+input PriceRange {
+  from: Int!
+  to: Int!
+}
+
+input GetGuitarsFilters {
+  price: PriceRange
+  stringsNumber: Int
+  """
+  Id of producer
+  """
+  producer: ID
+  """
+  Id of availability
+  """
+  availability: ID
+  """
+  Id of bodyWood
+  """
+  bodyWood: ID
+  """
+  Id of bridge
+  """
+  bridge: ID
+  """
+  Id of fingerboardWood
+  """
+  fingerboardWood: ID
+  """
+  Id of pickupsSet
+  """
+  pickupsSet: ID
+  """
+  Id of shape
+  """
+  shape: ID
+  """
+  Id of guitarType
+  """
+  guitarType: ID
+}
+
 type Query {
   """
   **PROTECTED**
   -
   **ONLY FOR ADMIN**
   """
-  getGuitars(offset: Int, limit: Int, sort: GetGuitarsSortInput!): GuitarsList!
+  getGuitars(
+    offset: Int
+    limit: Int
+    sort: GetGuitarsSortInput!
+    filters: GetGuitarsFilters
+  ): GuitarsList!
 
   """
   **PROTECTED**
