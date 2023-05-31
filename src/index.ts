@@ -1,5 +1,11 @@
+import { expressMiddleware } from "@apollo/server/express4";
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
+import express from "express";
+import http from "http";
+import { json } from "body-parser";
+import cors from "cors";
+
 import { ApolloServer } from "@apollo/server";
-import { startStandaloneServer } from "@apollo/server/standalone";
 
 import mongoose from "mongoose";
 import { MONGO_DB_URI, PORT } from "constants/env";
@@ -8,19 +14,30 @@ import context, { Context } from "./context";
 import resolvers from "./resolvers";
 import typeDefs from "./typeDefs";
 
+const app = express();
+
+const httpServer = http.createServer(app);
+
 const server = new ApolloServer<Context>({
   typeDefs,
   resolvers,
   status400ForVariableCoercionErrors: true,
+  plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
 });
 
-startStandaloneServer(server, {
-  listen: { port: +PORT },
-  context,
-})
-  .then(({ url }) => {
-    // eslint-disable-next-line no-console
-    console.log(`Server ready at: ${url}`);
+server
+  .start()
+  .then(() => {
+    app.use(
+      "/",
+      cors<cors.CorsRequest>({
+        origin: "*", // you can put "*" or ["http://localhost:3000"] but ["*"] won't work and front will receive `NetworkError when attempting to fetch resource.` error
+      }),
+      json(),
+      expressMiddleware(server, {
+        context,
+      })
+    );
 
     mongoose
       .connect(MONGO_DB_URI, {
@@ -30,6 +47,11 @@ startStandaloneServer(server, {
       .then(() => {
         // eslint-disable-next-line no-console
         console.log(`Connected to MongoDB!`);
+
+        httpServer.listen({ port: +PORT }, () => {
+          // eslint-disable-next-line no-console
+          console.log(`Server ready at: http://localhost:${+PORT}`);
+        });
       })
       .catch((err) => {
         // eslint-disable-next-line no-console
