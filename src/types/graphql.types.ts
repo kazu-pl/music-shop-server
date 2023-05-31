@@ -27,10 +27,72 @@ export type AddGuitarFilterInput = {
   type: GuitarFilterTypeEnum;
 };
 
+export type AddGuitarInput = {
+  availabilityId: Scalars['String'];
+  bodyWoodId: Scalars['String'];
+  bridgeId: Scalars['String'];
+  description: Scalars['String'];
+  fingerboardWoodId: Scalars['String'];
+  fretsNumber: Scalars['Int'];
+  guitarTypeId: Scalars['String'];
+  name: Scalars['String'];
+  pickupsSetId: Scalars['String'];
+  price: Scalars['Int'];
+  producerId: Scalars['String'];
+  scaleLength: Scalars['Float'];
+  shapeId: Scalars['String'];
+  stringsNumber: Scalars['Int'];
+};
+
+export type GetGuitarsFilters = {
+  /** Id of availability */
+  availability?: InputMaybe<Scalars['ID']>;
+  /** Id of bodyWood */
+  bodyWood?: InputMaybe<Scalars['ID']>;
+  /** Id of bridge */
+  bridge?: InputMaybe<Scalars['ID']>;
+  /** Id of fingerboardWood */
+  fingerboardWood?: InputMaybe<Scalars['ID']>;
+  /** Id of guitarType */
+  guitarType?: InputMaybe<Scalars['ID']>;
+  /** Id of pickupsSet */
+  pickupsSet?: InputMaybe<Scalars['ID']>;
+  price?: InputMaybe<PriceRange>;
+  /** Id of producer */
+  producer?: InputMaybe<Scalars['ID']>;
+  /** Id of shape */
+  shape?: InputMaybe<Scalars['ID']>;
+  stringsNumber?: InputMaybe<Scalars['Int']>;
+};
+
+export type GetGuitarsSortInput = {
+  sortBy: SortByKeys;
+  sortOrder?: InputMaybe<SortOrder>;
+};
+
+export type Guitar = {
+  __typename?: 'Guitar';
+  _id: Scalars['ID'];
+  availability: GuitarFilter;
+  bodyWood: GuitarFilter;
+  bridge: GuitarFilter;
+  description: Scalars['String'];
+  fingerboardWood: GuitarFilter;
+  fretsNumber: Scalars['Int'];
+  guitarType: GuitarFilter;
+  name: Scalars['String'];
+  pickupsSet: GuitarFilter;
+  price: Scalars['Int'];
+  producer: GuitarFilter;
+  scaleLength: Scalars['Float'];
+  shape: GuitarFilter;
+  stringsNumber: Scalars['Int'];
+};
+
 export type GuitarFilter = {
   __typename?: 'GuitarFilter';
+  _id: Scalars['ID'];
   description?: Maybe<Scalars['String']>;
-  id: Scalars['ID'];
   name: Scalars['String'];
   type: GuitarFilterTypeEnum;
 };
@@ -52,6 +114,12 @@ export type GuitarFiltersList = {
   totalItems: Scalars['Int'];
 };
 
+export type GuitarsList = {
+  __typename?: 'GuitarsList';
+  data: Array<Guitar>;
+  totalItems: Scalars['Int'];
+};
+
 export type LoginCredentialsInput = {
   email: Scalars['String'];
   password: Scalars['String'];
@@ -59,6 +127,12 @@ export type LoginCredentialsInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  /**
+   * **PROTECTED**
+   * -
+   * **ONLY FOR ADMIN**
+   */
+  addGuitar: SuccessfulReqMsg;
   /**
    * **PROTECTED**
    * -
@@ -77,9 +151,21 @@ export type Mutation = {
    * -
    * **ONLY FOR ADMIN**
    */
+  removeGuitar: SuccessfulReqMsg;
+  /**
+   * **PROTECTED**
+   * -
+   * **ONLY FOR ADMIN**
+   */
   removeGuitarFilter: SuccessfulReqMsg;
   /** use this to get new accessToken if yours expired. Pass refreshToken to obtain accessToken */
   renewAccessToken: AccessTokenResponse;
+  /**
+   * **PROTECTED**
+   * -
+   * **ONLY FOR ADMIN**
+   */
+  updateGuitar: SuccessfulReqMsg;
   /**
    * **PROTECTED**
    * -
@@ -90,6 +176,11 @@ export type Mutation = {
   updateUserData: SuccessfulReqMsg;
   /** **PROTECTED** */
   updateUserPassword: SuccessfulReqMsg;
+};
+
+
+export type MutationAddGuitarArgs = {
+  newGuitar: AddGuitarInput;
 };
 
 
@@ -108,6 +199,11 @@ export type MutationRegisterArgs = {
 };
 
 
+export type MutationRemoveGuitarArgs = {
+  id: Scalars['ID'];
+};
+
+
 export type MutationRemoveGuitarFilterArgs = {
   id: Scalars['ID'];
 };
@@ -115,6 +211,11 @@ export type MutationRemoveGuitarFilterArgs = {
 
 export type MutationRenewAccessTokenArgs = {
   refreshCredentials: RefreshTokenInput;
+};
+
+
+export type MutationUpdateGuitarArgs = {
+  guitar: UpdateGuitarInput;
 };
 
 
@@ -132,8 +233,19 @@ export type MutationUpdateUserPasswordArgs = {
   newPasswordInput: NewPasswordInput;
 };
 
+export type PriceRange = {
+  from: Scalars['Int'];
+  to: Scalars['Int'];
+};
+
 export type Query = {
   __typename?: 'Query';
+  /**
+   * **PROTECTED**
+   * -
+   * **ONLY FOR ADMIN**
+   */
+  getGuitar: Guitar;
   /**
    * **PROTECTED**
    * -
@@ -146,10 +258,21 @@ export type Query = {
    * **ONLY FOR ADMIN**
    */
   getGuitarFilters: GuitarFiltersList;
+  /**
+   * **PROTECTED**
+   * -
+   * **ONLY FOR ADMIN**
+   */
+  getGuitars: GuitarsList;
   /** **PROTECTED** */
   getUserData: UserType;
   /** **PROTECTED** */
   removeUser: SuccessfulReqMsg;
+};
+
+
+export type QueryGetGuitarArgs = {
+  id: Scalars['ID'];
 };
 
 
@@ -164,6 +287,14 @@ export type QueryGetGuitarFiltersArgs = {
   type: GuitarFilterTypeEnum;
 };
 
+
+export type QueryGetGuitarsArgs = {
+  filters?: InputMaybe<GetGuitarsFilters>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  sort: GetGuitarsSortInput;
+};
+
 export type RefreshTokenInput = {
   refreshToken: Scalars['String'];
 };
@@ -172,6 +303,23 @@ export type RegisterCredentialsInput = {
   data: User;
   password: Scalars['String'];
 };
+
+export enum SortByGeneral {
+  Default = 'DEFAULT',
+  Latest = 'LATEST'
+}
+
+export enum SortByKeys {
+  Default = 'DEFAULT',
+  Latest = 'LATEST',
+  Name = 'NAME',
+  Price = 'PRICE'
+}
+
+export enum SortOrder {
+  Asc = 'ASC',
+  Desc = 'DESC'
+}
 
 export type SuccessfulReqMsg = {
   __typename?: 'SuccessfulReqMsg';
@@ -194,6 +342,24 @@ export type UpdateGuitarFilterInput = {
   id: Scalars['ID'];
   name: Scalars['String'];
   type: GuitarFilterTypeEnum;
+};
+
+export type UpdateGuitarInput = {
+  availabilityId: Scalars['String'];
+  bodyWoodId: Scalars['String'];
+  bridgeId: Scalars['String'];
+  description: Scalars['String'];
+  fingerboardWoodId: Scalars['String'];
+  fretsNumber: Scalars['Int'];
+  guitarTypeId: Scalars['String'];
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  pickupsSetId: Scalars['String'];
+  price: Scalars['Int'];
+  producerId: Scalars['String'];
+  scaleLength: Scalars['Float'];
+  shapeId: Scalars['String'];
+  stringsNumber: Scalars['Int'];
 };
 
 export type User = {
@@ -297,21 +463,32 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversTypes = {
   AccessTokenResponse: ResolverTypeWrapper<AccessTokenResponse>;
   AddGuitarFilterInput: AddGuitarFilterInput;
+  AddGuitarInput: AddGuitarInput;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  Float: ResolverTypeWrapper<Scalars['Float']>;
+  GetGuitarsFilters: GetGuitarsFilters;
+  GetGuitarsSortInput: GetGuitarsSortInput;
+  Guitar: ResolverTypeWrapper<Guitar>;
   GuitarFilter: ResolverTypeWrapper<GuitarFilter>;
   GuitarFilterTypeEnum: GuitarFilterTypeEnum;
   GuitarFiltersList: ResolverTypeWrapper<GuitarFiltersList>;
+  GuitarsList: ResolverTypeWrapper<GuitarsList>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   LoginCredentialsInput: LoginCredentialsInput;
   Mutation: ResolverTypeWrapper<{}>;
+  PriceRange: PriceRange;
   Query: ResolverTypeWrapper<{}>;
   RefreshTokenInput: RefreshTokenInput;
   RegisterCredentialsInput: RegisterCredentialsInput;
+  SortByGeneral: SortByGeneral;
+  SortByKeys: SortByKeys;
+  SortOrder: SortOrder;
   String: ResolverTypeWrapper<Scalars['String']>;
   SuccessfulReqMsg: ResolverTypeWrapper<SuccessfulReqMsg>;
   Tokens: ResolverTypeWrapper<Tokens>;
   UpdateGuitarFilterInput: UpdateGuitarFilterInput;
+  UpdateGuitarInput: UpdateGuitarInput;
   User: User;
   UserType: ResolverTypeWrapper<UserType>;
   newPasswordInput: NewPasswordInput;
@@ -321,13 +498,20 @@ export type ResolversTypes = {
 export type ResolversParentTypes = {
   AccessTokenResponse: AccessTokenResponse;
   AddGuitarFilterInput: AddGuitarFilterInput;
+  AddGuitarInput: AddGuitarInput;
   Boolean: Scalars['Boolean'];
+  Float: Scalars['Float'];
+  GetGuitarsFilters: GetGuitarsFilters;
+  GetGuitarsSortInput: GetGuitarsSortInput;
+  Guitar: Guitar;
   GuitarFilter: GuitarFilter;
   GuitarFiltersList: GuitarFiltersList;
+  GuitarsList: GuitarsList;
   ID: Scalars['ID'];
   Int: Scalars['Int'];
   LoginCredentialsInput: LoginCredentialsInput;
   Mutation: {};
+  PriceRange: PriceRange;
   Query: {};
   RefreshTokenInput: RefreshTokenInput;
   RegisterCredentialsInput: RegisterCredentialsInput;
@@ -335,6 +519,7 @@ export type ResolversParentTypes = {
   SuccessfulReqMsg: SuccessfulReqMsg;
   Tokens: Tokens;
   UpdateGuitarFilterInput: UpdateGuitarFilterInput;
+  UpdateGuitarInput: UpdateGuitarInput;
   User: User;
   UserType: UserType;
   newPasswordInput: NewPasswordInput;
@@ -345,9 +530,28 @@ export type AccessTokenResponseResolvers<ContextType = Context, ParentType exten
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type GuitarResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Guitar'] = ResolversParentTypes['Guitar']> = {
+  _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  availability?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  bodyWood?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  bridge?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  fingerboardWood?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  fretsNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  guitarType?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  pickupsSet?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  price?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  producer?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  scaleLength?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  shape?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  stringsNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type GuitarFilterResolvers<ContextType = Context, ParentType extends ResolversParentTypes['GuitarFilter'] = ResolversParentTypes['GuitarFilter']> = {
+  _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   type?: Resolver<ResolversTypes['GuitarFilterTypeEnum'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -359,20 +563,31 @@ export type GuitarFiltersListResolvers<ContextType = Context, ParentType extends
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type GuitarsListResolvers<ContextType = Context, ParentType extends ResolversParentTypes['GuitarsList'] = ResolversParentTypes['GuitarsList']> = {
+  data?: Resolver<Array<ResolversTypes['Guitar']>, ParentType, ContextType>;
+  totalItems?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  addGuitar?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationAddGuitarArgs, 'newGuitar'>>;
   addGuitarFilter?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationAddGuitarFilterArgs, 'newGuitarFilter'>>;
   login?: Resolver<ResolversTypes['Tokens'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'loginCredentials'>>;
   register?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'registerCredentials'>>;
+  removeGuitar?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationRemoveGuitarArgs, 'id'>>;
   removeGuitarFilter?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationRemoveGuitarFilterArgs, 'id'>>;
   renewAccessToken?: Resolver<ResolversTypes['AccessTokenResponse'], ParentType, ContextType, RequireFields<MutationRenewAccessTokenArgs, 'refreshCredentials'>>;
+  updateGuitar?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationUpdateGuitarArgs, 'guitar'>>;
   updateGuitarFilter?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationUpdateGuitarFilterArgs, 'guitarFilter'>>;
   updateUserData?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationUpdateUserDataArgs, 'data'>>;
   updateUserPassword?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationUpdateUserPasswordArgs, 'newPasswordInput'>>;
 };
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  getGuitar?: Resolver<ResolversTypes['Guitar'], ParentType, ContextType, RequireFields<QueryGetGuitarArgs, 'id'>>;
   getGuitarFilter?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType, RequireFields<QueryGetGuitarFilterArgs, 'id'>>;
   getGuitarFilters?: Resolver<ResolversTypes['GuitarFiltersList'], ParentType, ContextType, RequireFields<QueryGetGuitarFiltersArgs, 'type'>>;
+  getGuitars?: Resolver<ResolversTypes['GuitarsList'], ParentType, ContextType, RequireFields<QueryGetGuitarsArgs, 'sort'>>;
   getUserData?: Resolver<ResolversTypes['UserType'], ParentType, ContextType>;
   removeUser?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType>;
 };
@@ -402,8 +617,10 @@ export type UserTypeResolvers<ContextType = Context, ParentType extends Resolver
 
 export type Resolvers<ContextType = Context> = {
   AccessTokenResponse?: AccessTokenResponseResolvers<ContextType>;
+  Guitar?: GuitarResolvers<ContextType>;
   GuitarFilter?: GuitarFilterResolvers<ContextType>;
   GuitarFiltersList?: GuitarFiltersListResolvers<ContextType>;
+  GuitarsList?: GuitarsListResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   SuccessfulReqMsg?: SuccessfulReqMsgResolvers<ContextType>;

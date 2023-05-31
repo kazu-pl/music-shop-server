@@ -8,6 +8,7 @@ const config: CodegenConfig = {
     "./src/common/schema.common.graphql",
     "./src/features/auth/auth.schema.graphql",
     "./src/features/guitars/filters/guitarFilters.schema.graphql",
+    "./src/features/guitars/guitar.schema.graphql",
   ],
   // schema: "./src/schema-graphql.ts", // it does not work?
   // schema: [

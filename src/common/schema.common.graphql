@@ -1,3 +1,13 @@
 type SuccessfulReqMsg {
   message: String!
 }
+
+enum SortOrder {
+  ASC
+  DESC
+}
+
+enum SortByGeneral {
+  DEFAULT
+  LATEST
+}

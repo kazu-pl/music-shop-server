@@ -1,12 +1,13 @@
 import { GraphQLError } from "graphql";
-import { Resolvers } from "types/graphql.types";
+import { GuitarFilter, Resolvers } from "types/graphql.types";
 import COMMON_MESSAGES from "constants/COMMON_MESSAGES";
-import checkAuthentication from "utils/checkAuthentication";
-import allowOnlyAdmin from "utils/allowOnlyAdmin";
-import GuitarFilterModel from "./models/GuitarFilter.model";
-import { GuitarFilterTypeEnum } from "types/graphql.types";
+import checkAuthentication from "utils/auth/checkAuthentication";
+import allowOnlyAdmin from "utils/auth/allowOnlyAdmin";
+import GuitarFilterModel from "./GuitarFilter.model";
 
-const authResolvers: Resolvers = {
+import getGuitarFilterById from "./utils/getGuitarFilterById";
+
+const guitarFiltersResolvers: Resolvers = {
   Query: {
     getGuitarFilters: async (parent, args) => {
       const { limit = 5, offset = 0, type } = args;
@@ -15,7 +16,7 @@ const authResolvers: Resolvers = {
         GuitarFilterModel.find({ type })
           .skip(offset as number)
           .limit(limit as number)
-          .sort({ name: 1 }),
+          .sort({ name: 1 }), // 1 for asc, -1 for desc
         GuitarFilterModel.countDocuments({ type }),
       ]);
 
@@ -24,33 +25,16 @@ const authResolvers: Resolvers = {
       }
 
       return {
-        data: data.map(({ _id, name, description, type }) => ({
-          id: _id,
-          name,
-          ...(description && { description }),
-          type: type as GuitarFilterTypeEnum,
-        })),
+        data: data as GuitarFilter[],
         totalItems: totalItems || 0,
       };
     },
 
     getGuitarFilter: async (parent, args) => {
       const { id } = args;
+      const result = await getGuitarFilterById(id);
 
-      const guitarFilter = await GuitarFilterModel.findOne({
-        _id: id,
-      }).exec();
-      if (!guitarFilter) {
-        throw new GraphQLError(COMMON_MESSAGES.NOT_FOUND);
-      }
-      return {
-        ...(guitarFilter.description && {
-          description: guitarFilter.description,
-        }),
-        id: guitarFilter._id,
-        name: guitarFilter.name,
-        type: guitarFilter.type as GuitarFilterTypeEnum,
-      };
+      return result;
     },
   },
 
@@ -61,11 +45,11 @@ const authResolvers: Resolvers = {
 
       const { name, description, type } = args.newGuitarFilter;
 
-      const guitarProducent = await GuitarFilterModel.findOne({
+      const guitarFilter = await GuitarFilterModel.findOne({
         name,
       }).exec();
 
-      if (guitarProducent) {
+      if (guitarFilter) {
         throw new GraphQLError(
           COMMON_MESSAGES.ITEM_WITH_NAME_ALREADY_EXIST_FN("Filter gitary")
         );
@@ -91,15 +75,15 @@ const authResolvers: Resolvers = {
 
       const { name, description, id, type } = args.guitarFilter;
 
-      const guitarProducent = await GuitarFilterModel.findOne({
+      const guitarFilter = await GuitarFilterModel.findOne({
         _id: id,
       }).exec();
 
-      if (!guitarProducent) {
+      if (!guitarFilter) {
         throw new GraphQLError(COMMON_MESSAGES.NOT_FOUND);
       }
       try {
-        await guitarProducent.updateOne({ name, description, type }).exec();
+        await guitarFilter.updateOne({ name, description, type }).exec();
 
         return {
           message: COMMON_MESSAGES.SUCCESSFULLY_UPDATED,
@@ -129,4 +113,4 @@ const authResolvers: Resolvers = {
   },
 };
 
-export default authResolvers;
+export default guitarFiltersResolvers;

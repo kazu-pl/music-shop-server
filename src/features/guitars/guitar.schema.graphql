@@ -1,0 +1,159 @@
+type Guitar {
+  _id: ID!
+  name: String!
+  description: String!
+  price: Int!
+  stringsNumber: Int!
+  scaleLength: Float!
+  fretsNumber: Int!
+  producer: GuitarFilter!
+  availability: GuitarFilter!
+  bodyWood: GuitarFilter!
+  bridge: GuitarFilter!
+  fingerboardWood: GuitarFilter!
+  pickupsSet: GuitarFilter!
+  shape: GuitarFilter!
+  guitarType: GuitarFilter!
+}
+
+type GuitarsList {
+  data: [Guitar!]!
+  totalItems: Int!
+}
+
+input AddGuitarInput {
+  name: String!
+  description: String!
+  price: Int!
+  stringsNumber: Int!
+  scaleLength: Float!
+  fretsNumber: Int!
+  producerId: String!
+  availabilityId: String!
+  bodyWoodId: String!
+  bridgeId: String!
+  fingerboardWoodId: String!
+  pickupsSetId: String!
+  shapeId: String!
+  guitarTypeId: String!
+}
+
+input UpdateGuitarInput {
+  id: ID!
+  name: String!
+  description: String!
+  price: Int!
+  stringsNumber: Int!
+  scaleLength: Float!
+  fretsNumber: Int!
+  producerId: String!
+  availabilityId: String!
+  bodyWoodId: String!
+  bridgeId: String!
+  fingerboardWoodId: String!
+  pickupsSetId: String!
+  shapeId: String!
+  guitarTypeId: String!
+}
+
+enum SortByKeys {
+  NAME
+  PRICE
+  DEFAULT
+  LATEST
+}
+enum SortOrder {
+  ASC
+  DESC
+}
+
+input GetGuitarsSortInput {
+  sortBy: SortByKeys!
+  sortOrder: SortOrder
+}
+
+input PriceRange {
+  from: Int!
+  to: Int!
+}
+
+input GetGuitarsFilters {
+  price: PriceRange
+  stringsNumber: Int
+  """
+  Id of producer
+  """
+  producer: ID
+  """
+  Id of availability
+  """
+  availability: ID
+  """
+  Id of bodyWood
+  """
+  bodyWood: ID
+  """
+  Id of bridge
+  """
+  bridge: ID
+  """
+  Id of fingerboardWood
+  """
+  fingerboardWood: ID
+  """
+  Id of pickupsSet
+  """
+  pickupsSet: ID
+  """
+  Id of shape
+  """
+  shape: ID
+  """
+  Id of guitarType
+  """
+  guitarType: ID
+}
+
+type Query {
+  """
+  **PROTECTED**
+  -
+  **ONLY FOR ADMIN**
+  """
+  getGuitars(
+    offset: Int
+    limit: Int
+    sort: GetGuitarsSortInput!
+    filters: GetGuitarsFilters
+  ): GuitarsList!
+
+  """
+  **PROTECTED**
+  -
+  **ONLY FOR ADMIN**
+  """
+  getGuitar(id: ID!): Guitar!
+}
+
+type Mutation {
+  """
+  **PROTECTED**
+  -
+  **ONLY FOR ADMIN**
+  """
+  addGuitar(newGuitar: AddGuitarInput!): SuccessfulReqMsg!
+
+  """
+  **PROTECTED**
+  -
+  **ONLY FOR ADMIN**
+  """
+  updateGuitar(guitar: UpdateGuitarInput!): SuccessfulReqMsg!
+
+  """
+  **PROTECTED**
+  -
+  **ONLY FOR ADMIN**
+  """
+  removeGuitar(id: ID!): SuccessfulReqMsg!
+}
