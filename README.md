@@ -1,3 +1,73 @@
+# How to create `Anything` scalar in graphqL:
+
+`1` - define scalar in graphql schema:
+
+```graphql
+# NOTE: The name here must match the name you specified in the `name` field of `GraphQLScalarType` constructor
+scalar Anything
+
+# the rest of your schema
+```
+
+`2` - create file like `GraphQLAnythingScalar.ts`:
+
+```ts
+// GraphQLAnythingScalar.ts
+
+const { GraphQLScalarType, Kind } = require("graphql");
+
+const Anything = new GraphQLScalarType({
+  name: "Anything",
+  description: "Any value.",
+  parseValue: (value) => value,
+  parseLiteral,
+  serialize: (value) => value,
+});
+
+function parseLiteral(ast) {
+  switch (ast.kind) {
+    case Kind.BOOLEAN:
+    case Kind.STRING:
+      return ast.value;
+    case Kind.INT:
+    case Kind.FLOAT:
+      return Number(ast.value);
+    case Kind.LIST:
+      return ast.values.map(parseLiteral);
+    case Kind.OBJECT:
+      return ast.fields.reduce((accumulator, field) => {
+        accumulator[field.name.value] = parseLiteral(field.value);
+        return accumulator;
+      }, {});
+    case Kind.NULL:
+      return null;
+    default:
+      throw new Error(`Unexpected kind in parseLiteral: ${ast.kind}`);
+  }
+}
+
+export default Anything;
+```
+
+`3` - generate graphql types via `yarn codegen` script and add resolver for `Anything` scalar:
+
+```ts
+import Anything from "./GraphQLAnythingScalar";
+
+const resolvers = {
+  ...// The property name here must match the name you specified in the constructor
+  Anything,
+};
+```
+
+`4` - now you can use it like this:
+
+```graphql
+type SomeResponse {
+  data: Anything
+}
+```
+
 # How to use `expressMiddleware` to enable custom `CORS` policy:
 
 ```ts
