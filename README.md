@@ -68,6 +68,8 @@ type SomeResponse {
 }
 ```
 
+found [here](https://stackoverflow.com/a/56196984)
+
 # How to use `expressMiddleware` to enable custom `CORS` policy:
 
 ```ts
