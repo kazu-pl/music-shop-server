@@ -15,6 +15,19 @@ import resolvers from "./resolvers";
 import typeDefs from "./typeDefs";
 
 import graphqlUploadExpress from "lib/graphql-upload/graphqlUploadExpress";
+import PhotoFileModel from "common/models/PhotoFile.model";
+import COMMON_MESSAGES from "constants/COMMON_MESSAGES";
+import { GridFSBucket } from "mongodb";
+import PHOTOS_BUCKET_NAME from "constants/PHOTOS_BUCKET_NAME";
+
+export let gridFSBucket: GridFSBucket;
+
+const conn = mongoose.connection;
+conn.once("open", () => {
+  gridFSBucket = new mongoose.mongo.GridFSBucket(conn.db, {
+    bucketName: PHOTOS_BUCKET_NAME,
+  });
+});
 
 const app = express();
 
@@ -30,19 +43,51 @@ const server = new ApolloServer<Context>({
 
 app.use(graphqlUploadExpress());
 
+app.use(
+  cors<cors.CorsRequest>({
+    origin: "*", // you can put "*" or ["http://localhost:3000"] but ["*"] won't work and front will receive `NetworkError when attempting to fetch resource.` error
+  })
+);
+app.use(json());
+
 server
   .start()
   .then(() => {
     app.use(
-      "/",
-      cors<cors.CorsRequest>({
-        origin: "*", // you can put "*" or ["http://localhost:3000"] but ["*"] won't work and front will receive `NetworkError when attempting to fetch resource.` error
-      }),
-      json(),
+      "/graphql",
       expressMiddleware(server, {
         context,
       })
     );
+
+    app.get("/", (req, res) =>
+      res.status(200).json({
+        message: `Witamy na serverze. Przejdź pod "/graphql", aby sprawdzić dostępne query i mutacje lub przejdź pod "/files/<id>", aby otrzymać zdjęcie`,
+      })
+    );
+
+    app.get("/files/:id", (req, res) => {
+      // this endpoint will produce error if it is applied onto Router and not directly here
+      PhotoFileModel.findOne({ _id: req.params.id })
+        .exec()
+        .then((file) => {
+          if (file === undefined || file === null) {
+            return res.status(404).json({
+              message: COMMON_MESSAGES.NOT_FOUND_FN("pliku"),
+            });
+          }
+
+          //  below line produces an error when you build server via `yarn build` and run via `yarn start`.
+          const readStream = gridFSBucket.openDownloadStream(file._id);
+          readStream.pipe(res);
+        })
+        .catch((error) => {
+          res.status(500).json({
+            message: COMMON_MESSAGES.AN_ERROR_OCCURED,
+            error,
+          });
+        });
+    });
 
     mongoose
       .connect(MONGO_DB_URI, {
