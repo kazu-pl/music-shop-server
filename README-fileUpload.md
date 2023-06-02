@@ -338,7 +338,7 @@ so to overcome this:
 
 - copy the package `fs-capacitor` from `node_modules` into `src/upload` folder,
 - update import to this package in `src/upload/processRequest.ts` file as it uses the original package, instead use the newly copied one
-- in this newly copied package replace value for `type` in its `package.json` file to `"type": "commonjs"`
+- in this newly copied `fs-capacitor` package replace value for `type` in its `package.json` file to the same type as your project has, for example to `"type": "commonjs"`
 
 It should work at this point.
 
@@ -363,6 +363,8 @@ Require stack:
     at Module._extensions..js (internal/modules/cjs/loader.js:1114:10)
 [ERROR] 17:28:02 Error: Cannot find module 'object-path'
 ```
+
+If you want, you can also change the copied `fs-capacitor` library into TypeScript. If you do so, then add `@ts-nocheck` comment at the top of its `index.ts` file and also in `processRequest.ts` update the import for `WriteStream` to `import { WriteStream } from "./fs-capacitor/dist";`
 
 _below code is optional to do and probably you don't have to do it_
 
