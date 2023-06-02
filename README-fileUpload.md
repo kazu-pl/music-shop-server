@@ -55,6 +55,7 @@ const server = new ApolloServer<Context>({
   status400ForVariableCoercionErrors: true,
   plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   csrfPrevention: false, // set this to false - it disposes your server to scrf attack but this is the only way to allow uploading files via graphql.
+  //  csrfPrevention: true ,// AS AN ALTERNATIVE: you can leave csrfPrevention set to true but on client frontend app use `graphql-upload-client` package and add header Apollo-Require-Preflight': 'true' to createUploadLink in apollo client. Foire info [here](https://www.apollographql.com/docs/apollo-server/security/cors/#graphql-upload)
 });
 
 app.use(graphqlUploadExpress()); // use it here - BEFORE server.start() function
