@@ -10,7 +10,13 @@ import getSortBy from "utils/db/getSortBy";
 import getSortOrder from "utils/db/getSortOrder";
 import getFilters from "utils/db/getFilters";
 
+import GraphQLUpload from "lib/graphql-upload/GraphQLUpload";
+import storeFile from "utils/db/storeFile";
+import PhotoFileModel from "common/models/PhotoFile.model";
+import PhotoChunkModel from "common/models/PhotoChunk.model";
+
 const guitarResolvers: Resolvers = {
+  Upload: GraphQLUpload,
   Guitar: {
     availability: async (parent) => {
       return await getGuitarModelFieldForResolver(parent, "availability");
@@ -85,6 +91,52 @@ const guitarResolvers: Resolvers = {
   },
 
   Mutation: {
+    updateGuitarImage: async (parent, { image, guitarId }, context) => {
+      checkAuthentication(context.user);
+      allowOnlyAdmin(context.user);
+
+      const guitar = await GuitarModel.findOne({ _id: guitarId }).exec();
+
+      if (!guitar) {
+        throw new GraphQLError(COMMON_MESSAGES.NOT_FOUND);
+      }
+
+      const imageId = await storeFile(image).then((result) => result);
+
+      if (guitar.imageId) {
+        const prevImage = await PhotoFileModel.findOne({ _id: guitar.imageId });
+
+        await PhotoChunkModel.deleteMany({ files_id: prevImage?._id }); // deletes chunks (photos.chunks model) of file
+        await prevImage?.deleteOne(); // deletes the file itself (photos.files model)
+      }
+
+      await guitar.updateOne({ imageId });
+
+      return imageId as unknown as string;
+    },
+
+    removeGuitarImage: async (parent, { guitarId }, context) => {
+      checkAuthentication(context.user);
+      allowOnlyAdmin(context.user);
+
+      const guitar = await GuitarModel.findOne({ _id: guitarId }).exec();
+
+      if (!guitar) {
+        throw new GraphQLError(COMMON_MESSAGES.NOT_FOUND);
+      }
+
+      if (guitar.imageId) {
+        const prevImage = await PhotoFileModel.findOne({ _id: guitar.imageId });
+
+        await PhotoChunkModel.deleteMany({ files_id: prevImage?._id }); // deletes chunks (photos.chunks model) of file
+        await prevImage?.deleteOne(); // deletes the file itself (photos.files model)
+      }
+
+      await guitar.updateOne({ $unset: { imageId: 1 } }); // removes totally `imageId` field
+
+      return { message: COMMON_MESSAGES.SUCCESSFULLY_REMOVED };
+    },
+
     addGuitar: async (parent, args, context) => {
       checkAuthentication(context.user);
       allowOnlyAdmin(context.user);

@@ -1,3 +1,9 @@
+# How to remove key from entity in mongoDB:
+
+```ts
+await guitar.updateOne({ $unset: { imageId: 1 } }); // removes totally `imageId` field
+```
+
 # How to create `Anything` scalar in graphqL:
 
 `1` - define scalar in graphql schema:

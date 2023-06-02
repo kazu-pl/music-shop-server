@@ -1,4 +1,4 @@
-import { GraphQLResolveInfo } from 'graphql';
+import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 import { Context } from '../context';
 import gql from 'graphql-tag';
 export type Maybe<T> = T | null;
@@ -14,6 +14,7 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  Upload: any;
 };
 
 export type AccessTokenResponse = {
@@ -42,6 +43,13 @@ export type AddGuitarInput = {
   scaleLength: Scalars['Float'];
   shapeId: Scalars['String'];
   stringsNumber: Scalars['Int'];
+};
+
+export type File = {
+  __typename?: 'File';
+  encoding: Scalars['String'];
+  filename: Scalars['String'];
+  mimetype: Scalars['String'];
 };
 
 export type GetGuitarsFilters = {
@@ -80,6 +88,7 @@ export type Guitar = {
   fingerboardWood: GuitarFilter;
   fretsNumber: Scalars['Int'];
   guitarType: GuitarFilter;
+  imageId?: Maybe<Scalars['ID']>;
   name: Scalars['String'];
   pickupsSet: GuitarFilter;
   price: Scalars['Int'];
@@ -158,6 +167,14 @@ export type Mutation = {
    * **ONLY FOR ADMIN**
    */
   removeGuitarFilter: SuccessfulReqMsg;
+  /**
+   * **PROTECTED**
+   * -
+   * **ONLY FOR ADMIN**
+   *
+   * remove guitar image
+   */
+  removeGuitarImage: SuccessfulReqMsg;
   /** use this to get new accessToken if yours expired. Pass refreshToken to obtain accessToken */
   renewAccessToken: AccessTokenResponse;
   /**
@@ -172,6 +189,14 @@ export type Mutation = {
    * **ONLY FOR ADMIN**
    */
   updateGuitarFilter: SuccessfulReqMsg;
+  /**
+   * **PROTECTED**
+   * -
+   * **ONLY FOR ADMIN**
+   *
+   * Send guitar id and its new image and obtain id of the new image
+   */
+  updateGuitarImage: Scalars['ID'];
   /** **PROTECTED** */
   updateUserData: SuccessfulReqMsg;
   /** **PROTECTED** */
@@ -209,6 +234,11 @@ export type MutationRemoveGuitarFilterArgs = {
 };
 
 
+export type MutationRemoveGuitarImageArgs = {
+  guitarId: Scalars['ID'];
+};
+
+
 export type MutationRenewAccessTokenArgs = {
   refreshCredentials: RefreshTokenInput;
 };
@@ -221,6 +251,12 @@ export type MutationUpdateGuitarArgs = {
 
 export type MutationUpdateGuitarFilterArgs = {
   guitarFilter: UpdateGuitarFilterInput;
+};
+
+
+export type MutationUpdateGuitarImageArgs = {
+  guitarId: Scalars['ID'];
+  image: Scalars['Upload'];
 };
 
 
@@ -465,6 +501,7 @@ export type ResolversTypes = {
   AddGuitarFilterInput: AddGuitarFilterInput;
   AddGuitarInput: AddGuitarInput;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  File: ResolverTypeWrapper<File>;
   Float: ResolverTypeWrapper<Scalars['Float']>;
   GetGuitarsFilters: GetGuitarsFilters;
   GetGuitarsSortInput: GetGuitarsSortInput;
@@ -489,6 +526,7 @@ export type ResolversTypes = {
   Tokens: ResolverTypeWrapper<Tokens>;
   UpdateGuitarFilterInput: UpdateGuitarFilterInput;
   UpdateGuitarInput: UpdateGuitarInput;
+  Upload: ResolverTypeWrapper<Scalars['Upload']>;
   User: User;
   UserType: ResolverTypeWrapper<UserType>;
   newPasswordInput: NewPasswordInput;
@@ -500,6 +538,7 @@ export type ResolversParentTypes = {
   AddGuitarFilterInput: AddGuitarFilterInput;
   AddGuitarInput: AddGuitarInput;
   Boolean: Scalars['Boolean'];
+  File: File;
   Float: Scalars['Float'];
   GetGuitarsFilters: GetGuitarsFilters;
   GetGuitarsSortInput: GetGuitarsSortInput;
@@ -520,6 +559,7 @@ export type ResolversParentTypes = {
   Tokens: Tokens;
   UpdateGuitarFilterInput: UpdateGuitarFilterInput;
   UpdateGuitarInput: UpdateGuitarInput;
+  Upload: Scalars['Upload'];
   User: User;
   UserType: UserType;
   newPasswordInput: NewPasswordInput;
@@ -527,6 +567,13 @@ export type ResolversParentTypes = {
 
 export type AccessTokenResponseResolvers<ContextType = Context, ParentType extends ResolversParentTypes['AccessTokenResponse'] = ResolversParentTypes['AccessTokenResponse']> = {
   accessToken?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type FileResolvers<ContextType = Context, ParentType extends ResolversParentTypes['File'] = ResolversParentTypes['File']> = {
+  encoding?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  filename?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  mimetype?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -539,6 +586,7 @@ export type GuitarResolvers<ContextType = Context, ParentType extends ResolversP
   fingerboardWood?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
   fretsNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   guitarType?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  imageId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   pickupsSet?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
   price?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -576,9 +624,11 @@ export type MutationResolvers<ContextType = Context, ParentType extends Resolver
   register?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'registerCredentials'>>;
   removeGuitar?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationRemoveGuitarArgs, 'id'>>;
   removeGuitarFilter?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationRemoveGuitarFilterArgs, 'id'>>;
+  removeGuitarImage?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationRemoveGuitarImageArgs, 'guitarId'>>;
   renewAccessToken?: Resolver<ResolversTypes['AccessTokenResponse'], ParentType, ContextType, RequireFields<MutationRenewAccessTokenArgs, 'refreshCredentials'>>;
   updateGuitar?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationUpdateGuitarArgs, 'guitar'>>;
   updateGuitarFilter?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationUpdateGuitarFilterArgs, 'guitarFilter'>>;
+  updateGuitarImage?: Resolver<ResolversTypes['ID'], ParentType, ContextType, RequireFields<MutationUpdateGuitarImageArgs, 'guitarId' | 'image'>>;
   updateUserData?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationUpdateUserDataArgs, 'data'>>;
   updateUserPassword?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationUpdateUserPasswordArgs, 'newPasswordInput'>>;
 };
@@ -603,6 +653,10 @@ export type TokensResolvers<ContextType = Context, ParentType extends ResolversP
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export interface UploadScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Upload'], any> {
+  name: 'Upload';
+}
+
 export type UserTypeResolvers<ContextType = Context, ParentType extends ResolversParentTypes['UserType'] = ResolversParentTypes['UserType']> = {
   city?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -617,6 +671,7 @@ export type UserTypeResolvers<ContextType = Context, ParentType extends Resolver
 
 export type Resolvers<ContextType = Context> = {
   AccessTokenResponse?: AccessTokenResponseResolvers<ContextType>;
+  File?: FileResolvers<ContextType>;
   Guitar?: GuitarResolvers<ContextType>;
   GuitarFilter?: GuitarFilterResolvers<ContextType>;
   GuitarFiltersList?: GuitarFiltersListResolvers<ContextType>;
@@ -625,6 +680,7 @@ export type Resolvers<ContextType = Context> = {
   Query?: QueryResolvers<ContextType>;
   SuccessfulReqMsg?: SuccessfulReqMsgResolvers<ContextType>;
   Tokens?: TokensResolvers<ContextType>;
+  Upload?: GraphQLScalarType;
   UserType?: UserTypeResolvers<ContextType>;
 };
 

@@ -43,6 +43,7 @@ export interface Guitar extends Document {
    * This is the id of guitar type whose resolved value can be `Electric` or `Acoustic` and so on
    */
   guitarType: string;
+  imageId?: string;
 }
 
 const GuitarSchema: Schema = new Schema(
@@ -94,6 +95,7 @@ const GuitarSchema: Schema = new Schema(
       required: true,
       ref: "guitarfilter",
     },
+    imageId: { type: mongoose.Types.ObjectId, required: false },
   },
   {
     timestamps: true,

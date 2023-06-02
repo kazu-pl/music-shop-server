@@ -1,4 +1,75 @@
-# How to upload files via graphQL:
+# How to send file to mongoDB obtained in graphQL Server in mutation:
+
+`1` - set ability to uploading files to graphql server. To do so, follow `How to upload files via graphQL to graphQL Server` title
+`2` - if you want to, you can modify mutation to send not only file but also id of some entity in mongoDB that should obrain file:
+
+```graphql
+type Mutation {
+  # send image and pass id of a guitar which should return in its data url to newly uplaoded image of the guitar
+  singleUpload(file: Upload!, guitarId: ID!): File!
+}
+```
+
+`3` - follow the instruction from [this](https://stackoverflow.com/questions/63420141/uploading-files-with-graphql-to-mongodb-with-mongoose) so in another words:
+
+- create `storeFile` function that handles the actall sending file to mongoDB:
+
+```ts
+// src/utils/storeFile.ts
+
+import mongoose from "mongoose";
+import { File } from "types/file";
+
+export interface File {
+  filename: string;
+  mimetype: string;
+  encoding: string;
+  createReadStream: any;
+}
+
+const storeFile = async (file: Promise<File>) => {
+  const { filename, createReadStream, mimetype } = await file.then(
+    (result: File) => result
+  );
+
+  const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+    bucketName: "photos",
+  });
+
+  // uploadStream contains for example `filename` of the passed file and its `id` in mongoDB database
+  const uploadStream = bucket.openUploadStream(filename, {
+    contentType: mimetype,
+  });
+  return new Promise<mongoose.mongo.BSON.ObjectId>((resolve, reject) => {
+    createReadStream()
+      .pipe(uploadStream)
+      .on("error", reject)
+      .on("finish", () => {
+        resolve(uploadStream.id);
+      });
+  });
+};
+
+export default storeFile;
+```
+
+- update resolvers map:
+
+```ts
+const resolvers = {
+  Mutation: {
+    singleUpload: async (parent, { file, guitarId }) => {
+      const fileId = await storeFile(file).then((result) => result);
+
+      GuitarModel.updateOne({ imageId: guitarId }).exec();
+
+      return { fileId };
+    },
+  },
+};
+```
+
+# How to upload files via graphQL to graphQL Server:
 
 There are multiple ways how to handle uploading files via graphQL server. First is to use `graphql-upload`:
 
@@ -55,6 +126,7 @@ const server = new ApolloServer<Context>({
   status400ForVariableCoercionErrors: true,
   plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   csrfPrevention: false, // set this to false - it disposes your server to scrf attack but this is the only way to allow uploading files via graphql.
+  //  csrfPrevention: true ,// AS AN ALTERNATIVE: you can leave csrfPrevention set to true but on client frontend app use `graphql-upload-client` package and add header Apollo-Require-Preflight': 'true' to createUploadLink in apollo client. Foire info [here](https://www.apollographql.com/docs/apollo-server/security/cors/#graphql-upload)
 });
 
 app.use(graphqlUploadExpress()); // use it here - BEFORE server.start() function
@@ -166,12 +238,12 @@ Error [ERR_REQUIRE_ESM]: Must use import to load ES Module: D:\folder-for-my-pro
 
 ```
 
-To overcome this, copy all files (`GrpahQLUpload.mjs`, also `Upload.mjs` together with `processRequest.mjs`, `ignoreStream.mjs`, `GRAPHQL_MULTIPART_REQUEST_SPEC_URL.mjs` and `GraphqlUploadExpress.mjs` becasue GrpahQLUpload imports them) from the installed package `graphql-upload` and paste them in your project into some folder like `src/upload`, change the newly copied files to `*.ts` files and resolves problems with any types.
+To overcome this, copy all files (`GrpahQLUpload.mjs`, also `Upload.mjs` together with `processRequest.mjs`, `ignoreStream.mjs`, `GRAPHQL_MULTIPART_REQUEST_SPEC_URL.mjs` and `GraphqlUploadExpress.mjs` becasue GrpahQLUpload imports them) from the installed package `graphql-upload` and paste them in your project into some folder like `src/upload` or `src/lib/graphql-upload`, change the newly copied files to `*.ts` files and resolves problems with any types.
 
 When done, use GraphlQlUpload.ts in resolver map:
 
 ```ts
-import GraphQLUploadTS from "upload/GraphQLUpload";
+import GraphQLUploadTS from "lib/graphql-upload/GraphQLUpload";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 // const GraphQLUpload = require("graphql-upload/GraphQLUpload.mjs");
@@ -212,7 +284,7 @@ instead of using `graphqlUploadExpress` from package `graphql-upload` you can us
 ```ts
 // index.ts
 
-import graphqlUploadExpressTS from "upload/graphqlUploadExpress";
+import graphqlUploadExpressTS from "lib/graphql-upload/graphqlUploadExpress";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 // const graphqlUploadExpress = require("graphql-upload/graphqlUploadExpress.mjs");
@@ -233,7 +305,7 @@ $ ts-node-dev -r tsconfig-paths/register src/index.ts
 [INFO] 16:37:42 ts-node-dev ver. 1.1.8 (using ts-node ver. 9.1.1, typescript ver. 5.0.4)
 Error [ERR_REQUIRE_ESM]: Must use import to load ES Module: D:\folder-for-my-projekt\node_modules\fs-capacitor\dist\index.js
 require() of ES modules is not supported.
-require() of D:\folder-for-my-projekt\node_modules\fs-capacitor\dist\index.js from D:\folder-for-my-projekt\src\upload\proce
+require() of D:\folder-for-my-projekt\node_modules\fs-capacitor\dist\index.js from D:\folder-for-my-projekt\src\lib\graphql-upload\proce
 ssRequest.ts is an ES module file as it is a .js file whose nearest parent package.json contains "type": "module" which defines all .js files in that
 package scope as ES modules.
 Instead rename index.js to end in .cjs, change the requiring code to use import(), or remove "type": "module" from D:\MY-GRAPHQL-SHOP-MAGISTERKA\serve
@@ -247,11 +319,11 @@ r2\node_modules\fs-capacitor\package.json.
     at Function.Module._load (internal/modules/cjs/loader.js:790:12)
     at Module.require (internal/modules/cjs/loader.js:974:19)
     at require (internal/modules/cjs/helpers.js:101:18)
-    at Object.<anonymous> (D:\folder-for-my-projekt\src\upload\processRequest.ts:4:1)
+    at Object.<anonymous> (D:\folder-for-my-projekt\src\lib\graphql-upload\processRequest.ts:4:1)
     at Module._compile (internal/modules/cjs/loader.js:1085:14)
 [ERROR] 16:37:48 Error: Must use import to load ES Module: D:\folder-for-my-projekt\node_modules\fs-capacitor\dist\index.js
 require() of ES modules is not supported.
-require() of D:\folder-for-my-projekt\node_modules\fs-capacitor\dist\index.js from D:\folder-for-my-projekt\src\upload\proce
+require() of D:\folder-for-my-projekt\node_modules\fs-capacitor\dist\index.js from D:\folder-for-my-projekt\src\lib\graphql-upload\proce
 
 ssRequest.ts is an ES module file as it is a .js file whose nearest parent package.json contains "type": "module" which defines all .js files in that
 package scope as ES modules.
@@ -264,11 +336,35 @@ r2\node_modules\fs-capacitor\package.json.
 
 so to overcome this:
 
-- copy the package `fs-capacitor` from `node_modules` into `src/upload` folder,
-- update import to this package in `src/upload/processRequest.ts` file as it uses the original package, instead use the newly copied one
-- in this newly copied package replace value for `type` in its `package.json` file to `"type": "commonjs"`
+- copy the package `fs-capacitor` from `node_modules` into some folder in your project like `src/upload` or `src/lib`,
+- update import to this package in `src/lib/graphql-upload/processRequest.ts` file as it uses the original package, instead use the newly copied one
+- in this newly copied `fs-capacitor` package replace value for `type` in its `package.json` file to the same type as your project has, for example to `"type": "commonjs"`
 
 It should work at this point.
+
+> At this point you've copied all files form `graphql-upload` library so there's no longer need to have it in dependencies so you can remove it. If you do so, add `object-path` package beacuse it was not copied by you and the `processRequest.ts` file uses it so without adding object-path as yur dependency you would see an error:
+
+```powershell
+
+Error: Cannot find module 'object-path'
+Require stack:
+- D:\folder-for-my-projekt\src\lib\graphql-upload\processRequest.ts
+- D:\folder-for-my-projekt\src\lib\graphql-upload\graphqlUploadExpress.ts
+- D:\folder-for-my-projekt\src\index.ts
+    at Function.Module._resolveFilename (internal/modules/cjs/loader.js:902:15)
+    at Function.Module._resolveFilename (D:\folder-for-my-projekt\node_modules\tsconfig-paths\src\register.ts:90:36)
+    at Function.Module._load (internal/modules/cjs/loader.js:746:27)
+    at Module.require (internal/modules/cjs/loader.js:974:19)
+    at require (internal/modules/cjs/helpers.js:101:18)
+    at Object.<anonymous> (D:\folder-for-my-projekt\src\lib\graphql-upload\processRequest.ts:7:1)
+    at Module._compile (internal/modules/cjs/loader.js:1085:14)
+    at Module._compile (D:\folder-for-my-projekt\node_modules\source-map-support\source-map-support.js:568:25)
+    at Module.m._compile (C:\Users\YourUserName\AppData\Local\Temp\ts-node-dev-hook-03864754668477555.js:69:33)
+    at Module._extensions..js (internal/modules/cjs/loader.js:1114:10)
+[ERROR] 17:28:02 Error: Cannot find module 'object-path'
+```
+
+If you want, you can also change the copied `fs-capacitor` library into TypeScript. If you do so, then add `@ts-nocheck` comment at the top of its `index.ts` file and also in `processRequest.ts` update the import for `WriteStream` to `import { WriteStream } from "./fs-capacitor/dist";`
 
 _below code is optional to do and probably you don't have to do it_
 
