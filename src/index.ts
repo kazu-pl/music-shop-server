@@ -25,7 +25,7 @@ const server = new ApolloServer<Context>({
   resolvers,
   status400ForVariableCoercionErrors: true,
   plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-  csrfPrevention: false,
+  csrfPrevention: false, // TODO: set this to true and header Apollo-Require-Preflight': 'true' in apollo--upload-client on frontend
 });
 
 app.use(graphqlUploadExpress());
