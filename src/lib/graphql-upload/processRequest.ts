@@ -2,7 +2,7 @@
 
 import busboy from "busboy";
 // import { WriteStream } from "fs-capacitor";
-import { WriteStream } from "./fs-capacitor/dist"; // use your own copied library and redirect to /dist as after changing files to typescript it won't be able to import WriteStream just from "./fs-capacitor"
+import { WriteStream } from "../fs-capacitor/dist"; // use your own copied library and redirect to /dist as after changing files to typescript it won't be able to import WriteStream just from "./fs-capacitor"
 import createError from "http-errors";
 import objectPath from "object-path";
 

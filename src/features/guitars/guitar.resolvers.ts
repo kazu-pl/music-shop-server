@@ -10,7 +10,7 @@ import getSortBy from "utils/db/getSortBy";
 import getSortOrder from "utils/db/getSortOrder";
 import getFilters from "utils/db/getFilters";
 
-import GraphQLUpload from "upload/GraphQLUpload";
+import GraphQLUpload from "lib/graphql-upload/GraphQLUpload";
 import storeFile from "utils/db/storeFile";
 import PhotoFileModel from "common/models/PhotoFile.model";
 import PhotoChunkModel from "common/models/PhotoChunk.model";

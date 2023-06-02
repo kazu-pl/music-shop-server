@@ -238,12 +238,12 @@ Error [ERR_REQUIRE_ESM]: Must use import to load ES Module: D:\folder-for-my-pro
 
 ```
 
-To overcome this, copy all files (`GrpahQLUpload.mjs`, also `Upload.mjs` together with `processRequest.mjs`, `ignoreStream.mjs`, `GRAPHQL_MULTIPART_REQUEST_SPEC_URL.mjs` and `GraphqlUploadExpress.mjs` becasue GrpahQLUpload imports them) from the installed package `graphql-upload` and paste them in your project into some folder like `src/upload`, change the newly copied files to `*.ts` files and resolves problems with any types.
+To overcome this, copy all files (`GrpahQLUpload.mjs`, also `Upload.mjs` together with `processRequest.mjs`, `ignoreStream.mjs`, `GRAPHQL_MULTIPART_REQUEST_SPEC_URL.mjs` and `GraphqlUploadExpress.mjs` becasue GrpahQLUpload imports them) from the installed package `graphql-upload` and paste them in your project into some folder like `src/upload` or `src/lib/graphql-upload`, change the newly copied files to `*.ts` files and resolves problems with any types.
 
 When done, use GraphlQlUpload.ts in resolver map:
 
 ```ts
-import GraphQLUploadTS from "upload/GraphQLUpload";
+import GraphQLUploadTS from "lib/graphql-upload/GraphQLUpload";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 // const GraphQLUpload = require("graphql-upload/GraphQLUpload.mjs");
@@ -284,7 +284,7 @@ instead of using `graphqlUploadExpress` from package `graphql-upload` you can us
 ```ts
 // index.ts
 
-import graphqlUploadExpressTS from "upload/graphqlUploadExpress";
+import graphqlUploadExpressTS from "lib/graphql-upload/graphqlUploadExpress";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 // const graphqlUploadExpress = require("graphql-upload/graphqlUploadExpress.mjs");
@@ -305,7 +305,7 @@ $ ts-node-dev -r tsconfig-paths/register src/index.ts
 [INFO] 16:37:42 ts-node-dev ver. 1.1.8 (using ts-node ver. 9.1.1, typescript ver. 5.0.4)
 Error [ERR_REQUIRE_ESM]: Must use import to load ES Module: D:\folder-for-my-projekt\node_modules\fs-capacitor\dist\index.js
 require() of ES modules is not supported.
-require() of D:\folder-for-my-projekt\node_modules\fs-capacitor\dist\index.js from D:\folder-for-my-projekt\src\upload\proce
+require() of D:\folder-for-my-projekt\node_modules\fs-capacitor\dist\index.js from D:\folder-for-my-projekt\src\lib\graphql-upload\proce
 ssRequest.ts is an ES module file as it is a .js file whose nearest parent package.json contains "type": "module" which defines all .js files in that
 package scope as ES modules.
 Instead rename index.js to end in .cjs, change the requiring code to use import(), or remove "type": "module" from D:\MY-GRAPHQL-SHOP-MAGISTERKA\serve
@@ -319,11 +319,11 @@ r2\node_modules\fs-capacitor\package.json.
     at Function.Module._load (internal/modules/cjs/loader.js:790:12)
     at Module.require (internal/modules/cjs/loader.js:974:19)
     at require (internal/modules/cjs/helpers.js:101:18)
-    at Object.<anonymous> (D:\folder-for-my-projekt\src\upload\processRequest.ts:4:1)
+    at Object.<anonymous> (D:\folder-for-my-projekt\src\lib\graphql-upload\processRequest.ts:4:1)
     at Module._compile (internal/modules/cjs/loader.js:1085:14)
 [ERROR] 16:37:48 Error: Must use import to load ES Module: D:\folder-for-my-projekt\node_modules\fs-capacitor\dist\index.js
 require() of ES modules is not supported.
-require() of D:\folder-for-my-projekt\node_modules\fs-capacitor\dist\index.js from D:\folder-for-my-projekt\src\upload\proce
+require() of D:\folder-for-my-projekt\node_modules\fs-capacitor\dist\index.js from D:\folder-for-my-projekt\src\lib\graphql-upload\proce
 
 ssRequest.ts is an ES module file as it is a .js file whose nearest parent package.json contains "type": "module" which defines all .js files in that
 package scope as ES modules.
@@ -336,8 +336,8 @@ r2\node_modules\fs-capacitor\package.json.
 
 so to overcome this:
 
-- copy the package `fs-capacitor` from `node_modules` into `src/upload` folder,
-- update import to this package in `src/upload/processRequest.ts` file as it uses the original package, instead use the newly copied one
+- copy the package `fs-capacitor` from `node_modules` into some folder in your project like `src/upload` or `src/lib`,
+- update import to this package in `src/lib/graphql-upload/processRequest.ts` file as it uses the original package, instead use the newly copied one
 - in this newly copied `fs-capacitor` package replace value for `type` in its `package.json` file to the same type as your project has, for example to `"type": "commonjs"`
 
 It should work at this point.
@@ -348,15 +348,15 @@ It should work at this point.
 
 Error: Cannot find module 'object-path'
 Require stack:
-- D:\folder-for-my-projekt\src\upload\processRequest.ts
-- D:\folder-for-my-projekt\src\upload\graphqlUploadExpress.ts
+- D:\folder-for-my-projekt\src\lib\graphql-upload\processRequest.ts
+- D:\folder-for-my-projekt\src\lib\graphql-upload\graphqlUploadExpress.ts
 - D:\folder-for-my-projekt\src\index.ts
     at Function.Module._resolveFilename (internal/modules/cjs/loader.js:902:15)
     at Function.Module._resolveFilename (D:\folder-for-my-projekt\node_modules\tsconfig-paths\src\register.ts:90:36)
     at Function.Module._load (internal/modules/cjs/loader.js:746:27)
     at Module.require (internal/modules/cjs/loader.js:974:19)
     at require (internal/modules/cjs/helpers.js:101:18)
-    at Object.<anonymous> (D:\folder-for-my-projekt\src\upload\processRequest.ts:7:1)
+    at Object.<anonymous> (D:\folder-for-my-projekt\src\lib\graphql-upload\processRequest.ts:7:1)
     at Module._compile (internal/modules/cjs/loader.js:1085:14)
     at Module._compile (D:\folder-for-my-projekt\node_modules\source-map-support\source-map-support.js:568:25)
     at Module.m._compile (C:\Users\YourUserName\AppData\Local\Temp\ts-node-dev-hook-03864754668477555.js:69:33)
