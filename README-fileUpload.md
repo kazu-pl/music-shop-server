@@ -1,4 +1,75 @@
-# How to upload files via graphQL:
+# How to send file to mongoDB obtained in graphQL Server in mutation:
+
+`1` - set ability to uploading files to graphql server. To do so, follow `How to upload files via graphQL to graphQL Server` title
+`2` - if you want to, you can modify mutation to send not only file but also id of some entity in mongoDB that should obrain file:
+
+```graphql
+type Mutation {
+  # send image and pass id of a guitar which should return in its data url to newly uplaoded image of the guitar
+  singleUpload(file: Upload!, guitarId: ID!): File!
+}
+```
+
+`3` - follow the instruction from [this](https://stackoverflow.com/questions/63420141/uploading-files-with-graphql-to-mongodb-with-mongoose) so in another words:
+
+- create `storeFile` function that handles the actall sending file to mongoDB:
+
+```ts
+// src/utils/storeFile.ts
+
+import mongoose from "mongoose";
+import { File } from "types/file";
+
+export interface File {
+  filename: string;
+  mimetype: string;
+  encoding: string;
+  createReadStream: any;
+}
+
+const storeFile = async (file: Promise<File>) => {
+  const { filename, createReadStream, mimetype } = await file.then(
+    (result: File) => result
+  );
+
+  const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+    bucketName: "photos",
+  });
+
+  // uploadStream contains for example `filename` of the passed file and its `id` in mongoDB database
+  const uploadStream = bucket.openUploadStream(filename, {
+    contentType: mimetype,
+  });
+  return new Promise<mongoose.mongo.BSON.ObjectId>((resolve, reject) => {
+    createReadStream()
+      .pipe(uploadStream)
+      .on("error", reject)
+      .on("finish", () => {
+        resolve(uploadStream.id);
+      });
+  });
+};
+
+export default storeFile;
+```
+
+- update resolvers map:
+
+```ts
+const resolvers = {
+  Mutation: {
+    singleUpload: async (parent, { file, guitarId }) => {
+      const fileId = await storeFile(file).then((result) => result);
+
+      GuitarModel.updateOne({ imageId: guitarId }).exec();
+
+      return { fileId };
+    },
+  },
+};
+```
+
+# How to upload files via graphQL to graphQL Server:
 
 There are multiple ways how to handle uploading files via graphQL server. First is to use `graphql-upload`:
 
@@ -270,6 +341,28 @@ so to overcome this:
 - in this newly copied package replace value for `type` in its `package.json` file to `"type": "commonjs"`
 
 It should work at this point.
+
+> At this point you've copied all files form `graphql-upload` library so there's no longer need to have it in dependencies so you can remove it. If you do so, add `object-path` package beacuse it was not copied by you and the `processRequest.ts` file uses it so without adding object-path as yur dependency you would see an error:
+
+```powershell
+
+Error: Cannot find module 'object-path'
+Require stack:
+- D:\folder-for-my-projekt\src\upload\processRequest.ts
+- D:\folder-for-my-projekt\src\upload\graphqlUploadExpress.ts
+- D:\folder-for-my-projekt\src\index.ts
+    at Function.Module._resolveFilename (internal/modules/cjs/loader.js:902:15)
+    at Function.Module._resolveFilename (D:\folder-for-my-projekt\node_modules\tsconfig-paths\src\register.ts:90:36)
+    at Function.Module._load (internal/modules/cjs/loader.js:746:27)
+    at Module.require (internal/modules/cjs/loader.js:974:19)
+    at require (internal/modules/cjs/helpers.js:101:18)
+    at Object.<anonymous> (D:\folder-for-my-projekt\src\upload\processRequest.ts:7:1)
+    at Module._compile (internal/modules/cjs/loader.js:1085:14)
+    at Module._compile (D:\folder-for-my-projekt\node_modules\source-map-support\source-map-support.js:568:25)
+    at Module.m._compile (C:\Users\YourUserName\AppData\Local\Temp\ts-node-dev-hook-03864754668477555.js:69:33)
+    at Module._extensions..js (internal/modules/cjs/loader.js:1114:10)
+[ERROR] 17:28:02 Error: Cannot find module 'object-path'
+```
 
 _below code is optional to do and probably you don't have to do it_
 

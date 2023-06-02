@@ -14,6 +14,8 @@ import context, { Context } from "./context";
 import resolvers from "./resolvers";
 import typeDefs from "./typeDefs";
 
+import graphqlUploadExpress from "upload/graphqlUploadExpress";
+
 const app = express();
 
 const httpServer = http.createServer(app);
@@ -23,7 +25,10 @@ const server = new ApolloServer<Context>({
   resolvers,
   status400ForVariableCoercionErrors: true,
   plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  csrfPrevention: false,
 });
+
+app.use(graphqlUploadExpress());
 
 server
   .start()
