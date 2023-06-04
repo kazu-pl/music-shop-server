@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { GuitarFilterName } from "./filters/GuitarFilter.model";
 
 export interface Guitar extends Document {
   name: string;
@@ -57,43 +58,43 @@ const GuitarSchema: Schema = new Schema(
     availability: {
       type: mongoose.Types.ObjectId,
       required: true,
-      ref: "guitarfilter",
+      ref: GuitarFilterName,
     },
     bodyWood: {
       type: mongoose.Types.ObjectId,
       required: true,
-      ref: "guitarfilter",
+      ref: GuitarFilterName,
     },
     bridge: {
       type: mongoose.Types.ObjectId,
       required: true,
-      ref: "guitarfilter",
+      ref: GuitarFilterName,
     },
     fingerboardWood: {
       type: mongoose.Types.ObjectId,
       required: true,
-      ref: "guitarfilter",
+      ref: GuitarFilterName,
     },
 
     guitarType: {
       type: mongoose.Types.ObjectId,
       required: true,
-      ref: "guitarfilter",
+      ref: GuitarFilterName,
     },
     pickupsSet: {
       type: mongoose.Types.ObjectId,
       required: true,
-      ref: "guitarfilter",
+      ref: GuitarFilterName,
     },
     producer: {
       type: mongoose.Types.ObjectId,
       required: true,
-      ref: "guitarfilter",
+      ref: GuitarFilterName,
     },
     shape: {
       type: mongoose.Types.ObjectId,
       required: true,
-      ref: "guitarfilter",
+      ref: GuitarFilterName,
     },
     imageId: { type: mongoose.Types.ObjectId, required: false },
   },

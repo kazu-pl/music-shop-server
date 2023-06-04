@@ -1,4 +1,40 @@
-type Guitar {
+interface GuitarBase {
+  _id: ID!
+  name: String!
+  description: String!
+  price: Int!
+  stringsNumber: Int!
+  scaleLength: Float!
+  fretsNumber: Int!
+  producer: GuitarFilter!
+  availability: GuitarFilter!
+  bodyWood: GuitarFilter!
+  bridge: GuitarFilter!
+  fingerboardWood: GuitarFilter!
+  pickupsSet: GuitarFilter!
+  shape: GuitarFilter!
+  guitarType: GuitarFilter!
+  imageId: ID
+}
+type Guitar implements GuitarBase {
+  _id: ID!
+  name: String!
+  description: String!
+  price: Int!
+  stringsNumber: Int!
+  scaleLength: Float!
+  fretsNumber: Int!
+  producer: GuitarFilter!
+  availability: GuitarFilter!
+  bodyWood: GuitarFilter!
+  bridge: GuitarFilter!
+  fingerboardWood: GuitarFilter!
+  pickupsSet: GuitarFilter!
+  shape: GuitarFilter!
+  guitarType: GuitarFilter!
+  imageId: ID
+}
+type GuitarWithDataLoader implements GuitarBase {
   _id: ID!
   name: String!
   description: String!
@@ -19,6 +55,11 @@ type Guitar {
 
 type GuitarsList {
   data: [Guitar!]!
+  totalItems: Int!
+}
+
+type GuitarsListWithdataLoder {
+  data: [GuitarWithDataLoader!]!
   totalItems: Int!
 }
 
@@ -126,8 +167,6 @@ type File {
 type Query {
   """
   **PROTECTED**
-  -
-  **ONLY FOR ADMIN**
   """
   getGuitars(
     offset: Int
@@ -138,8 +177,15 @@ type Query {
 
   """
   **PROTECTED**
-  -
-  **ONLY FOR ADMIN**
+  """
+  getGuitarsWithDataLoader(
+    offset: Int
+    limit: Int
+    sort: GetGuitarsSortInput!
+    filters: GetGuitarsFilters
+  ): GuitarsListWithdataLoder!
+  """
+  **PROTECTED**
   """
   getGuitar(id: ID!): Guitar!
 }

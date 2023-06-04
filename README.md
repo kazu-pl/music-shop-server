@@ -1,3 +1,42 @@
+# Error `Cast to ObjectId failed for value \"[ 'someId', 'someOtherId' ]\" (type Array) at path \"_id\" for model \"GuitarFilter\""`:
+
+if you got error like this:
+
+```json
+{
+  "data": {},
+  "errors": [
+    {
+      "message": "Cast to ObjectId failed for value '[ 'someId', 'someOtherId' ]' (type Array) at path '_id' for model 'GuitarFilter'"
+    }
+  ]
+}
+```
+
+then it means you have an array with Ids but you put it in another array in where method:
+
+```ts
+// ids = ["someId", "someOtherId"]
+
+const availabilities = await GuitarFilterModel.where("_id").in([ids]).exec();
+```
+
+so in real, you got: [["someId", "someOtherId"]] which causes the error. Simply remove the array brackets:
+
+```ts
+const availabilities = await GuitarFilterModel.where("_id").in(ids).exec();
+```
+
+,
+But you will get `Argument of type 'readonly string[]' is not assignable to parameter of type 'any[]'. The type 'readonly string[]' is 'readonly' and cannot be assigned to the mutable type 'any[]'` Error because `in()` accepts mutable array and `ids` parameter (received in dataLoader param) is immutable so to overcome this simply make new array when passing it into `in()`:
+
+```ts
+// now in() gets new array so TS won't complain about mutability because [...ids] is a new array and even if it was modified it would not modify the original array ids
+const availabilities = await GuitarFilterModel.where("_id")
+  .in([...ids])
+  .exec();
+```
+
 # How to remove key from entity in mongoDB:
 
 ```ts

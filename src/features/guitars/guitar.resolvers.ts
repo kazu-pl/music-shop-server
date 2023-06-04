@@ -1,5 +1,5 @@
 import { GraphQLError } from "graphql";
-import { Resolvers, Guitar } from "types/graphql.types";
+import { Resolvers, Guitar, GuitarWithDataLoader } from "types/graphql.types";
 import COMMON_MESSAGES from "constants/COMMON_MESSAGES";
 import checkAuthentication from "utils/auth/checkAuthentication";
 import allowOnlyAdmin from "utils/auth/allowOnlyAdmin";
@@ -14,9 +14,41 @@ import GraphQLUpload from "lib/graphql-upload/GraphQLUpload";
 import storeFile from "utils/db/storeFile";
 import PhotoFileModel from "common/models/PhotoFile.model";
 import PhotoChunkModel from "common/models/PhotoChunk.model";
+import mongoose from "mongoose";
+import getGuitarFiltersFromDataLoader from "./utils/getGuitarFiltersFromDataLoader";
 
 const guitarResolvers: Resolvers = {
   Upload: GraphQLUpload,
+
+  GuitarWithDataLoader: {
+    availability: async (parent, args, context) => {
+      const id = (
+        parent.availability as unknown as mongoose.Types.ObjectId
+      ).toHexString(); // get _id string value instead of New ObjectId("...")
+
+      return await context.loaders.availabilityLoader.load(id);
+    },
+    bodyWood: async (parent, args, context) =>
+      getGuitarFiltersFromDataLoader(parent, context, "bodyWoodLoader"),
+
+    bridge: async (parent, args, context) =>
+      getGuitarFiltersFromDataLoader(parent, context, "bridgeLoader"),
+
+    fingerboardWood: async (parent, args, context) =>
+      getGuitarFiltersFromDataLoader(parent, context, "fingerboardWoodLoader"),
+
+    guitarType: async (parent, args, context) =>
+      getGuitarFiltersFromDataLoader(parent, context, "guitarTypeLoader"),
+
+    pickupsSet: async (parent, args, context) =>
+      getGuitarFiltersFromDataLoader(parent, context, "pickupsSetLoader"),
+
+    producer: async (parent, args, context) =>
+      getGuitarFiltersFromDataLoader(parent, context, "producerLoader"),
+
+    shape: async (parent, args, context) =>
+      getGuitarFiltersFromDataLoader(parent, context, "shapeLoaderLoader"),
+  },
   Guitar: {
     availability: async (parent) => {
       return await getGuitarModelFieldForResolver(parent, "availability");
@@ -44,13 +76,8 @@ const guitarResolvers: Resolvers = {
     },
   },
   Query: {
-    getGuitars: async (parent, args) => {
+    getGuitarsWithDataLoader: async (parent, args) => {
       const { limit = 5, offset = 0, sort, filters } = args;
-
-      // eslint-disable-next-line no-console
-      console.log(
-        `SELECT Guitars list, with limit: ${limit}, offset: ${offset}`
-      );
 
       const sortBy = getSortBy(sort.sortBy);
       const sortOrder = getSortOrder(sort.sortOrder);
@@ -61,6 +88,7 @@ const guitarResolvers: Resolvers = {
         GuitarModel.find({
           ...filtersToUse,
         })
+          // .populate("availability") // add this if you want to get availablity filter instead of just its id
           .skip(offset as number)
           .limit(limit as number)
           .sort({ [sortBy]: sortOrder }), // 1 for asc, -1 for desc
@@ -70,7 +98,41 @@ const guitarResolvers: Resolvers = {
       if (!data) {
         throw new GraphQLError(COMMON_MESSAGES.AN_ERROR_OCCURED);
       }
+      // eslint-disable-next-line no-console
+      console.log(
+        `SELECT ${totalItems} Guitars in list, with limit: ${limit}, offset: ${offset}`
+      );
+      return {
+        data: data as unknown as GuitarWithDataLoader[],
+        totalItems: totalItems || 0,
+      };
+    },
+    getGuitars: async (parent, args) => {
+      const { limit = 5, offset = 0, sort, filters } = args;
 
+      const sortBy = getSortBy(sort.sortBy);
+      const sortOrder = getSortOrder(sort.sortOrder);
+
+      const filtersToUse = getFilters(filters);
+
+      const [data, totalItems] = await Promise.all([
+        GuitarModel.find({
+          ...filtersToUse,
+        })
+          // .populate("availability") // add this if you want to get availablity filter instead of just its id
+          .skip(offset as number)
+          .limit(limit as number)
+          .sort({ [sortBy]: sortOrder }), // 1 for asc, -1 for desc
+        GuitarModel.countDocuments({ ...filtersToUse }),
+      ]);
+
+      if (!data) {
+        throw new GraphQLError(COMMON_MESSAGES.AN_ERROR_OCCURED);
+      }
+      // eslint-disable-next-line no-console
+      console.log(
+        `SELECT ${totalItems} Guitars in list, with limit: ${limit}, offset: ${offset}`
+      );
       return {
         data: data as unknown as Guitar[],
         totalItems: totalItems || 0,
@@ -83,9 +145,11 @@ const guitarResolvers: Resolvers = {
       const guitar = await GuitarModel.findOne({
         _id: id,
       }).exec();
+
       if (!guitar) {
         throw new GraphQLError(COMMON_MESSAGES.NOT_FOUND);
       }
+
       return guitar as unknown as Guitar; // in fact this field will return keys from model kept in db like `producer` which is prodicer filter id but the type Guitar wants me to return real Filter (whic is returned in guitar.producer resolver) so I have to cast it as unknown and then as Guitar to let the typescript accept it
     },
   },

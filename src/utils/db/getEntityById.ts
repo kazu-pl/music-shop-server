@@ -1,15 +1,12 @@
 import { GraphQLError } from "graphql";
 
 import COMMON_MESSAGES from "constants/COMMON_MESSAGES";
-import { MongooseAddons } from "types/mongoose.types";
-import { Model, Document } from "mongoose";
+import { MWithId, MongooseAddons } from "types/mongoose.types";
+import { Model } from "mongoose";
 
 /**
  * This type is to tell TypeScript that returned item from DB for sure has `_id` field because by default returned data has it optional when returning from DB
  */
-interface MWithId {
-  _id: Exclude<Document["_id"], undefined>;
-}
 
 const getEntityById = async <M>(
   id: string,

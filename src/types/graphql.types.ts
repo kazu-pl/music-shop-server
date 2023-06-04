@@ -78,8 +78,27 @@ export type GetGuitarsSortInput = {
   sortOrder?: InputMaybe<SortOrder>;
 };
 
-export type Guitar = {
+export type Guitar = GuitarBase & {
   __typename?: 'Guitar';
+  _id: Scalars['ID'];
+  availability: GuitarFilter;
+  bodyWood: GuitarFilter;
+  bridge: GuitarFilter;
+  description: Scalars['String'];
+  fingerboardWood: GuitarFilter;
+  fretsNumber: Scalars['Int'];
+  guitarType: GuitarFilter;
+  imageId?: Maybe<Scalars['ID']>;
+  name: Scalars['String'];
+  pickupsSet: GuitarFilter;
+  price: Scalars['Int'];
+  producer: GuitarFilter;
+  scaleLength: Scalars['Float'];
+  shape: GuitarFilter;
+  stringsNumber: Scalars['Int'];
+};
+
+export type GuitarBase = {
   _id: Scalars['ID'];
   availability: GuitarFilter;
   bodyWood: GuitarFilter;
@@ -123,9 +142,35 @@ export type GuitarFiltersList = {
   totalItems: Scalars['Int'];
 };
 
+export type GuitarWithDataLoader = GuitarBase & {
+  __typename?: 'GuitarWithDataLoader';
+  _id: Scalars['ID'];
+  availability: GuitarFilter;
+  bodyWood: GuitarFilter;
+  bridge: GuitarFilter;
+  description: Scalars['String'];
+  fingerboardWood: GuitarFilter;
+  fretsNumber: Scalars['Int'];
+  guitarType: GuitarFilter;
+  imageId?: Maybe<Scalars['ID']>;
+  name: Scalars['String'];
+  pickupsSet: GuitarFilter;
+  price: Scalars['Int'];
+  producer: GuitarFilter;
+  scaleLength: Scalars['Float'];
+  shape: GuitarFilter;
+  stringsNumber: Scalars['Int'];
+};
+
 export type GuitarsList = {
   __typename?: 'GuitarsList';
   data: Array<Guitar>;
+  totalItems: Scalars['Int'];
+};
+
+export type GuitarsListWithdataLoder = {
+  __typename?: 'GuitarsListWithdataLoder';
+  data: Array<GuitarWithDataLoader>;
   totalItems: Scalars['Int'];
 };
 
@@ -300,6 +345,12 @@ export type Query = {
    * **ONLY FOR ADMIN**
    */
   getGuitars: GuitarsList;
+  /**
+   * **PROTECTED**
+   * -
+   * **ONLY FOR ADMIN**
+   */
+  getGuitarsWithDataLoader: GuitarsListWithdataLoder;
   /** **PROTECTED** */
   getUserData: UserType;
   /** **PROTECTED** */
@@ -325,6 +376,14 @@ export type QueryGetGuitarFiltersArgs = {
 
 
 export type QueryGetGuitarsArgs = {
+  filters?: InputMaybe<GetGuitarsFilters>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  sort: GetGuitarsSortInput;
+};
+
+
+export type QueryGetGuitarsWithDataLoaderArgs = {
   filters?: InputMaybe<GetGuitarsFilters>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -506,10 +565,13 @@ export type ResolversTypes = {
   GetGuitarsFilters: GetGuitarsFilters;
   GetGuitarsSortInput: GetGuitarsSortInput;
   Guitar: ResolverTypeWrapper<Guitar>;
+  GuitarBase: ResolversTypes['Guitar'] | ResolversTypes['GuitarWithDataLoader'];
   GuitarFilter: ResolverTypeWrapper<GuitarFilter>;
   GuitarFilterTypeEnum: GuitarFilterTypeEnum;
   GuitarFiltersList: ResolverTypeWrapper<GuitarFiltersList>;
+  GuitarWithDataLoader: ResolverTypeWrapper<GuitarWithDataLoader>;
   GuitarsList: ResolverTypeWrapper<GuitarsList>;
+  GuitarsListWithdataLoder: ResolverTypeWrapper<GuitarsListWithdataLoder>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   LoginCredentialsInput: LoginCredentialsInput;
@@ -543,9 +605,12 @@ export type ResolversParentTypes = {
   GetGuitarsFilters: GetGuitarsFilters;
   GetGuitarsSortInput: GetGuitarsSortInput;
   Guitar: Guitar;
+  GuitarBase: ResolversParentTypes['Guitar'] | ResolversParentTypes['GuitarWithDataLoader'];
   GuitarFilter: GuitarFilter;
   GuitarFiltersList: GuitarFiltersList;
+  GuitarWithDataLoader: GuitarWithDataLoader;
   GuitarsList: GuitarsList;
+  GuitarsListWithdataLoder: GuitarsListWithdataLoder;
   ID: Scalars['ID'];
   Int: Scalars['Int'];
   LoginCredentialsInput: LoginCredentialsInput;
@@ -597,6 +662,26 @@ export type GuitarResolvers<ContextType = Context, ParentType extends ResolversP
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type GuitarBaseResolvers<ContextType = Context, ParentType extends ResolversParentTypes['GuitarBase'] = ResolversParentTypes['GuitarBase']> = {
+  __resolveType: TypeResolveFn<'Guitar' | 'GuitarWithDataLoader', ParentType, ContextType>;
+  _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  availability?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  bodyWood?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  bridge?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  fingerboardWood?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  fretsNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  guitarType?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  imageId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  pickupsSet?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  price?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  producer?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  scaleLength?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  shape?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  stringsNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+};
+
 export type GuitarFilterResolvers<ContextType = Context, ParentType extends ResolversParentTypes['GuitarFilter'] = ResolversParentTypes['GuitarFilter']> = {
   _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -611,8 +696,34 @@ export type GuitarFiltersListResolvers<ContextType = Context, ParentType extends
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type GuitarWithDataLoaderResolvers<ContextType = Context, ParentType extends ResolversParentTypes['GuitarWithDataLoader'] = ResolversParentTypes['GuitarWithDataLoader']> = {
+  _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  availability?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  bodyWood?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  bridge?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  fingerboardWood?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  fretsNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  guitarType?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  imageId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  pickupsSet?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  price?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  producer?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  scaleLength?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  shape?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType>;
+  stringsNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type GuitarsListResolvers<ContextType = Context, ParentType extends ResolversParentTypes['GuitarsList'] = ResolversParentTypes['GuitarsList']> = {
   data?: Resolver<Array<ResolversTypes['Guitar']>, ParentType, ContextType>;
+  totalItems?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type GuitarsListWithdataLoderResolvers<ContextType = Context, ParentType extends ResolversParentTypes['GuitarsListWithdataLoder'] = ResolversParentTypes['GuitarsListWithdataLoder']> = {
+  data?: Resolver<Array<ResolversTypes['GuitarWithDataLoader']>, ParentType, ContextType>;
   totalItems?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -638,6 +749,7 @@ export type QueryResolvers<ContextType = Context, ParentType extends ResolversPa
   getGuitarFilter?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType, RequireFields<QueryGetGuitarFilterArgs, 'id'>>;
   getGuitarFilters?: Resolver<ResolversTypes['GuitarFiltersList'], ParentType, ContextType, RequireFields<QueryGetGuitarFiltersArgs, 'type'>>;
   getGuitars?: Resolver<ResolversTypes['GuitarsList'], ParentType, ContextType, RequireFields<QueryGetGuitarsArgs, 'sort'>>;
+  getGuitarsWithDataLoader?: Resolver<ResolversTypes['GuitarsListWithdataLoder'], ParentType, ContextType, RequireFields<QueryGetGuitarsWithDataLoaderArgs, 'sort'>>;
   getUserData?: Resolver<ResolversTypes['UserType'], ParentType, ContextType>;
   removeUser?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType>;
 };
@@ -673,9 +785,12 @@ export type Resolvers<ContextType = Context> = {
   AccessTokenResponse?: AccessTokenResponseResolvers<ContextType>;
   File?: FileResolvers<ContextType>;
   Guitar?: GuitarResolvers<ContextType>;
+  GuitarBase?: GuitarBaseResolvers<ContextType>;
   GuitarFilter?: GuitarFilterResolvers<ContextType>;
   GuitarFiltersList?: GuitarFiltersListResolvers<ContextType>;
+  GuitarWithDataLoader?: GuitarWithDataLoaderResolvers<ContextType>;
   GuitarsList?: GuitarsListResolvers<ContextType>;
+  GuitarsListWithdataLoder?: GuitarsListWithdataLoderResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   SuccessfulReqMsg?: SuccessfulReqMsgResolvers<ContextType>;
