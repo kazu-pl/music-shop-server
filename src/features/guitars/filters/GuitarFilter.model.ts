@@ -1,6 +1,8 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { GuitarFilterTypeEnum } from "types/graphql.types";
 
+export const GuitarFilterName = "GuitarFilter";
+
 export interface GuitarFilterModelType extends Document {
   name: string;
   description: string;
@@ -27,7 +29,7 @@ const GuitarFilterSchema: Schema = new Schema({
 });
 
 const GuitarFilterModel = mongoose.model<GuitarFilterModelType>(
-  "GuitarFilter",
+  GuitarFilterName,
   GuitarFilterSchema
 );
 
