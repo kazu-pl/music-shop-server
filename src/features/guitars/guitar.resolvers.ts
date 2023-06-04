@@ -1,14 +1,16 @@
 import { GraphQLError } from "graphql";
-import { Resolvers, Guitar, GuitarWithDataLoader } from "types/graphql.types";
+import {
+  Resolvers,
+  Guitar,
+  GuitarWithDataLoader,
+  GuitarPopulated,
+} from "types/graphql.types";
 import COMMON_MESSAGES from "constants/COMMON_MESSAGES";
 import checkAuthentication from "utils/auth/checkAuthentication";
 import allowOnlyAdmin from "utils/auth/allowOnlyAdmin";
 import GuitarModel from "./Guitar.model";
 import getErrorMessage from "utils/getErrorMessage";
 import getGuitarModelFieldForResolver from "./utils/getGuitarModelFieldForResolver";
-import getSortBy from "utils/db/getSortBy";
-import getSortOrder from "utils/db/getSortOrder";
-import getFilters from "utils/db/getFilters";
 
 import GraphQLUpload from "lib/graphql-upload/GraphQLUpload";
 import storeFile from "utils/db/storeFile";
@@ -16,6 +18,7 @@ import PhotoFileModel from "common/models/PhotoFile.model";
 import PhotoChunkModel from "common/models/PhotoChunk.model";
 import mongoose from "mongoose";
 import getGuitarFiltersFromDataLoader from "./utils/getGuitarFiltersFromDataLoader";
+import getGuitarsQueryResolver from "./utils/getGuitarsQueryResolver";
 
 const guitarResolvers: Resolvers = {
   Upload: GraphQLUpload,
@@ -76,68 +79,26 @@ const guitarResolvers: Resolvers = {
     },
   },
   Query: {
-    getGuitarsWithDataLoader: async (parent, args) => {
-      const { limit = 5, offset = 0, sort, filters } = args;
+    getGuitarsPopulated: async (parent, args, context, info) =>
+      getGuitarsQueryResolver<GuitarPopulated>(
+        parent,
+        args,
+        context,
+        info,
+        "populated"
+      ),
 
-      const sortBy = getSortBy(sort.sortBy);
-      const sortOrder = getSortOrder(sort.sortOrder);
+    getGuitarsWithDataLoader: async (parent, args, context, info) =>
+      getGuitarsQueryResolver<GuitarWithDataLoader>(
+        parent,
+        args,
+        context,
+        info,
+        "dataLoader"
+      ),
 
-      const filtersToUse = getFilters(filters);
-
-      const [data, totalItems] = await Promise.all([
-        GuitarModel.find({
-          ...filtersToUse,
-        })
-          // .populate("availability") // add this if you want to get availablity filter instead of just its id
-          .skip(offset as number)
-          .limit(limit as number)
-          .sort({ [sortBy]: sortOrder }), // 1 for asc, -1 for desc
-        GuitarModel.countDocuments({ ...filtersToUse }),
-      ]);
-
-      if (!data) {
-        throw new GraphQLError(COMMON_MESSAGES.AN_ERROR_OCCURED);
-      }
-      // eslint-disable-next-line no-console
-      console.log(
-        `SELECT ${totalItems} Guitars in list, with limit: ${limit}, offset: ${offset}`
-      );
-      return {
-        data: data as unknown as GuitarWithDataLoader[],
-        totalItems: totalItems || 0,
-      };
-    },
-    getGuitars: async (parent, args) => {
-      const { limit = 5, offset = 0, sort, filters } = args;
-
-      const sortBy = getSortBy(sort.sortBy);
-      const sortOrder = getSortOrder(sort.sortOrder);
-
-      const filtersToUse = getFilters(filters);
-
-      const [data, totalItems] = await Promise.all([
-        GuitarModel.find({
-          ...filtersToUse,
-        })
-          // .populate("availability") // add this if you want to get availablity filter instead of just its id
-          .skip(offset as number)
-          .limit(limit as number)
-          .sort({ [sortBy]: sortOrder }), // 1 for asc, -1 for desc
-        GuitarModel.countDocuments({ ...filtersToUse }),
-      ]);
-
-      if (!data) {
-        throw new GraphQLError(COMMON_MESSAGES.AN_ERROR_OCCURED);
-      }
-      // eslint-disable-next-line no-console
-      console.log(
-        `SELECT ${totalItems} Guitars in list, with limit: ${limit}, offset: ${offset}`
-      );
-      return {
-        data: data as unknown as Guitar[],
-        totalItems: totalItems || 0,
-      };
-    },
+    getGuitars: async (parent, args, context, info) =>
+      getGuitarsQueryResolver<Guitar>(parent, args, context, info),
 
     getGuitar: async (parent, args) => {
       const { id } = args;

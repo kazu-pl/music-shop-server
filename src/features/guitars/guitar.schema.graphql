@@ -52,6 +52,24 @@ type GuitarWithDataLoader implements GuitarBase {
   guitarType: GuitarFilter!
   imageId: ID
 }
+type GuitarPopulated implements GuitarBase {
+  _id: ID!
+  name: String!
+  description: String!
+  price: Int!
+  stringsNumber: Int!
+  scaleLength: Float!
+  fretsNumber: Int!
+  producer: GuitarFilter!
+  availability: GuitarFilter!
+  bodyWood: GuitarFilter!
+  bridge: GuitarFilter!
+  fingerboardWood: GuitarFilter!
+  pickupsSet: GuitarFilter!
+  shape: GuitarFilter!
+  guitarType: GuitarFilter!
+  imageId: ID
+}
 
 type GuitarsList {
   data: [Guitar!]!
@@ -60,6 +78,10 @@ type GuitarsList {
 
 type GuitarsListWithdataLoder {
   data: [GuitarWithDataLoader!]!
+  totalItems: Int!
+}
+type GuitarsListPopulated {
+  data: [GuitarPopulated!]!
   totalItems: Int!
 }
 
@@ -184,6 +206,17 @@ type Query {
     sort: GetGuitarsSortInput!
     filters: GetGuitarsFilters
   ): GuitarsListWithdataLoder!
+
+  """
+  **PROTECTED**
+  """
+  getGuitarsPopulated(
+    offset: Int
+    limit: Int
+    sort: GetGuitarsSortInput!
+    filters: GetGuitarsFilters
+  ): GuitarsListPopulated!
+
   """
   **PROTECTED**
   """
