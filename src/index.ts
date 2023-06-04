@@ -100,7 +100,7 @@ server
 
         httpServer.listen({ port: +PORT }, () => {
           // eslint-disable-next-line no-console
-          console.log(`Server ready at: http://localhost:${+PORT}`);
+          console.log(`Server ready at: http://localhost:${+PORT}/graphql`);
         });
       })
       .catch((err) => {

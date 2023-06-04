@@ -1,3 +1,8 @@
+# How to change console.log color:
+
+also [here](https://blog.logrocket.com/using-console-colors-node-js/)
+found [here](https://stackoverflow.com/questions/9781218/how-to-change-node-jss-console-font-color)
+
 # Error `Cast to ObjectId failed for value \"[ 'someId', 'someOtherId' ]\" (type Array) at path \"_id\" for model \"GuitarFilter\""`:
 
 if you got error like this:
