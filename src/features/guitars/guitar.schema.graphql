@@ -187,9 +187,6 @@ type File {
 }
 
 type Query {
-  """
-  **PROTECTED**
-  """
   getGuitars(
     offset: Int
     limit: Int
@@ -197,9 +194,6 @@ type Query {
     filters: GetGuitarsFilters
   ): GuitarsList!
 
-  """
-  **PROTECTED**
-  """
   getGuitarsWithDataLoader(
     offset: Int
     limit: Int
@@ -207,9 +201,6 @@ type Query {
     filters: GetGuitarsFilters
   ): GuitarsListWithdataLoder!
 
-  """
-  **PROTECTED**
-  """
   getGuitarsPopulated(
     offset: Int
     limit: Int
@@ -217,9 +208,13 @@ type Query {
     filters: GetGuitarsFilters
   ): GuitarsListPopulated!
 
-  """
-  **PROTECTED**
-  """
+  getGuitarsPopulatedOptionally(
+    offset: Int
+    limit: Int
+    sort: GetGuitarsSortInput!
+    filters: GetGuitarsFilters
+  ): GuitarsListPopulated!
+
   getGuitar(id: ID!): Guitar!
 }
 

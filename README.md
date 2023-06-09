@@ -1,3 +1,33 @@
+# How to check if frontend quered for some field and optionally / conditionally populate data:
+
+```ts
+const resolvers: Resolvers = {
+  Query: {
+    getGuitar: async (parent, args, context, info) => {
+      // arguments![3] is the 3rd argument of query which can be filters (like in this case) but it depends on how the query was described in schema and it might be for example `limit` so you have to check which argument is filters list
+
+      const isAvailabilityQuered =
+        info!.fieldNodes[0]!.arguments![3].name.loc?.source.body.includes(
+          "availability"
+        );
+
+      const promiseToGetData = GuitarModel.find({
+        ...filtersToUse,
+      });
+
+      if (isAvailabilityQuered) {
+        promiseToGetData.populate("availability");
+      }
+
+      const data = await promiseToGetData
+        .skip(offset as number)
+        .limit(limit as number)
+        .sort({ [sortBy]: sortOrder });
+    },
+  },
+};
+```
+
 # How to change console.log color:
 
 also [here](https://blog.logrocket.com/using-console-colors-node-js/)
@@ -1011,3 +1041,7 @@ then you have to visit the `https://github.com/nodejs/node-gyp#installation` lin
 # How I get this project building and running
 
 options found [here](https://bobbyhadz.com/blog/typescript-uncaught-referenceerror-exports-is-not-defined#nodejs---referenceerror-exports-is-not-defined)
+
+---
+
+Develop this project with Node v16.18.1
