@@ -33,23 +33,6 @@ const authResolvers: Resolvers = {
 
       return result.data;
     },
-    removeUser: async (parent, args, context) => {
-      checkAuthentication(context.user);
-
-      const result = await UserModel.findOne({
-        _id: context.user?._id,
-      }).exec();
-
-      if (!result) {
-        throw new GraphQLError(COMMON_MESSAGES.NOT_FOUND_FN("użytkownika"));
-      }
-      try {
-        await result.deleteOne();
-        return { message: AUTH_MESSAGES.ACCOUNT_REMOVED };
-      } catch (error) {
-        throw new GraphQLError(COMMON_MESSAGES.AN_ERROR_OCCURED);
-      }
-    },
   },
 
   Mutation: {
@@ -261,6 +244,23 @@ const authResolvers: Resolvers = {
         return {
           message: AUTH_MESSAGES.ACCOUNT_UPDATED,
         };
+      } catch (error) {
+        throw new GraphQLError(COMMON_MESSAGES.AN_ERROR_OCCURED);
+      }
+    },
+    removeUser: async (parent, args, context) => {
+      checkAuthentication(context.user);
+
+      const result = await UserModel.findOne({
+        _id: context.user?._id,
+      }).exec();
+
+      if (!result) {
+        throw new GraphQLError(COMMON_MESSAGES.NOT_FOUND_FN("użytkownika"));
+      }
+      try {
+        await result.deleteOne();
+        return { message: AUTH_MESSAGES.ACCOUNT_REMOVED };
       } catch (error) {
         throw new GraphQLError(COMMON_MESSAGES.AN_ERROR_OCCURED);
       }

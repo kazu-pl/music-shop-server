@@ -58,10 +58,6 @@ type Query {
   **PROTECTED**
   """
   getUserData: UserType!
-  """
-  **PROTECTED**
-  """
-  removeUser: SuccessfulReqMsg!
 }
 
 type Mutation {
@@ -84,4 +80,8 @@ type Mutation {
   **PROTECTED**
   """
   updateUserPassword(newPasswordInput: newPasswordInput!): SuccessfulReqMsg!
+  """
+  **PROTECTED**
+  """
+  removeUser: SuccessfulReqMsg!
 }
