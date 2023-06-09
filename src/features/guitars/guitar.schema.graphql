@@ -1,0 +1,259 @@
+interface GuitarBase {
+  _id: ID!
+  name: String!
+  description: String!
+  price: Int!
+  stringsNumber: Int!
+  scaleLength: Float!
+  fretsNumber: Int!
+  producer: GuitarFilter!
+  availability: GuitarFilter!
+  bodyWood: GuitarFilter!
+  bridge: GuitarFilter!
+  fingerboardWood: GuitarFilter!
+  pickupsSet: GuitarFilter!
+  shape: GuitarFilter!
+  guitarType: GuitarFilter!
+  imageId: ID
+}
+type Guitar implements GuitarBase {
+  _id: ID!
+  name: String!
+  description: String!
+  price: Int!
+  stringsNumber: Int!
+  scaleLength: Float!
+  fretsNumber: Int!
+  producer: GuitarFilter!
+  availability: GuitarFilter!
+  bodyWood: GuitarFilter!
+  bridge: GuitarFilter!
+  fingerboardWood: GuitarFilter!
+  pickupsSet: GuitarFilter!
+  shape: GuitarFilter!
+  guitarType: GuitarFilter!
+  imageId: ID
+}
+type GuitarWithDataLoader implements GuitarBase {
+  _id: ID!
+  name: String!
+  description: String!
+  price: Int!
+  stringsNumber: Int!
+  scaleLength: Float!
+  fretsNumber: Int!
+  producer: GuitarFilter!
+  availability: GuitarFilter!
+  bodyWood: GuitarFilter!
+  bridge: GuitarFilter!
+  fingerboardWood: GuitarFilter!
+  pickupsSet: GuitarFilter!
+  shape: GuitarFilter!
+  guitarType: GuitarFilter!
+  imageId: ID
+}
+type GuitarPopulated implements GuitarBase {
+  _id: ID!
+  name: String!
+  description: String!
+  price: Int!
+  stringsNumber: Int!
+  scaleLength: Float!
+  fretsNumber: Int!
+  producer: GuitarFilter!
+  availability: GuitarFilter!
+  bodyWood: GuitarFilter!
+  bridge: GuitarFilter!
+  fingerboardWood: GuitarFilter!
+  pickupsSet: GuitarFilter!
+  shape: GuitarFilter!
+  guitarType: GuitarFilter!
+  imageId: ID
+}
+
+type GuitarsList {
+  data: [Guitar!]!
+  totalItems: Int!
+}
+
+type GuitarsListWithdataLoder {
+  data: [GuitarWithDataLoader!]!
+  totalItems: Int!
+}
+type GuitarsListPopulated {
+  data: [GuitarPopulated!]!
+  totalItems: Int!
+}
+
+input AddGuitarInput {
+  name: String!
+  description: String!
+  price: Int!
+  stringsNumber: Int!
+  scaleLength: Float!
+  fretsNumber: Int!
+  producerId: String!
+  availabilityId: String!
+  bodyWoodId: String!
+  bridgeId: String!
+  fingerboardWoodId: String!
+  pickupsSetId: String!
+  shapeId: String!
+  guitarTypeId: String!
+}
+
+input UpdateGuitarInput {
+  id: ID!
+  name: String!
+  description: String!
+  price: Int!
+  stringsNumber: Int!
+  scaleLength: Float!
+  fretsNumber: Int!
+  producerId: String!
+  availabilityId: String!
+  bodyWoodId: String!
+  bridgeId: String!
+  fingerboardWoodId: String!
+  pickupsSetId: String!
+  shapeId: String!
+  guitarTypeId: String!
+}
+
+enum SortByKeys {
+  NAME
+  PRICE
+  DEFAULT
+  LATEST
+}
+enum SortOrder {
+  ASC
+  DESC
+}
+
+input GetGuitarsSortInput {
+  sortBy: SortByKeys!
+  sortOrder: SortOrder
+}
+
+input PriceRange {
+  from: Int!
+  to: Int!
+}
+
+input GetGuitarsFilters {
+  price: PriceRange
+  stringsNumber: Int
+  """
+  Id of producer
+  """
+  producer: ID
+  """
+  Id of availability
+  """
+  availability: ID
+  """
+  Id of bodyWood
+  """
+  bodyWood: ID
+  """
+  Id of bridge
+  """
+  bridge: ID
+  """
+  Id of fingerboardWood
+  """
+  fingerboardWood: ID
+  """
+  Id of pickupsSet
+  """
+  pickupsSet: ID
+  """
+  Id of shape
+  """
+  shape: ID
+  """
+  Id of guitarType
+  """
+  guitarType: ID
+}
+
+scalar Upload
+
+type File {
+  filename: String!
+  mimetype: String!
+  encoding: String!
+}
+
+type Query {
+  getGuitars(
+    offset: Int
+    limit: Int
+    sort: GetGuitarsSortInput!
+    filters: GetGuitarsFilters
+  ): GuitarsList!
+
+  getGuitarsWithDataLoader(
+    offset: Int
+    limit: Int
+    sort: GetGuitarsSortInput!
+    filters: GetGuitarsFilters
+  ): GuitarsListWithdataLoder!
+
+  getGuitarsPopulated(
+    offset: Int
+    limit: Int
+    sort: GetGuitarsSortInput!
+    filters: GetGuitarsFilters
+  ): GuitarsListPopulated!
+
+  getGuitarsPopulatedOptionally(
+    offset: Int
+    limit: Int
+    sort: GetGuitarsSortInput!
+    filters: GetGuitarsFilters
+  ): GuitarsListPopulated!
+
+  getGuitar(id: ID!): Guitar!
+}
+
+type Mutation {
+  """
+  **PROTECTED**
+  -
+  **ONLY FOR ADMIN**
+  """
+  addGuitar(newGuitar: AddGuitarInput!): SuccessfulReqMsg!
+
+  """
+  **PROTECTED**
+  -
+  **ONLY FOR ADMIN**
+  """
+  updateGuitar(guitar: UpdateGuitarInput!): SuccessfulReqMsg!
+
+  """
+  **PROTECTED**
+  -
+  **ONLY FOR ADMIN**
+  """
+  removeGuitar(id: ID!): SuccessfulReqMsg!
+
+  """
+  **PROTECTED**
+  -
+  **ONLY FOR ADMIN**
+
+  Send guitar id and its new image and obtain id of the new image
+  """
+  updateGuitarImage(image: Upload!, guitarId: ID!): ID!
+  """
+  **PROTECTED**
+  -
+  **ONLY FOR ADMIN**
+
+  remove guitar image
+  """
+  removeGuitarImage(guitarId: ID!): SuccessfulReqMsg!
+}

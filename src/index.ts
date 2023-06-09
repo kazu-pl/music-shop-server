@@ -1,63 +1,114 @@
+import { expressMiddleware } from "@apollo/server/express4";
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
+import express from "express";
+import http from "http";
+import { json } from "body-parser";
+import cors from "cors";
+
 import { ApolloServer } from "@apollo/server";
-import renderText from "something/renderText";
-import { startStandaloneServer } from "@apollo/server/standalone";
 
-const typeDefs = `#graphql
+import mongoose from "mongoose";
+import { MONGO_DB_URI, PORT } from "constants/env";
 
-  type Book {
-    title: String
-    author: String
-  }
+import context, { Context } from "./context";
+import resolvers from "./resolvers";
+import typeDefs from "./typeDefs";
 
-  type Query {
-    books: [Book]
-  }
+import graphqlUploadExpress from "lib/graphql-upload/graphqlUploadExpress";
+import PhotoFileModel from "common/models/PhotoFile.model";
+import COMMON_MESSAGES from "constants/COMMON_MESSAGES";
+import { GridFSBucket } from "mongodb";
+import PHOTOS_BUCKET_NAME from "constants/PHOTOS_BUCKET_NAME";
 
-`;
-const books = [
-  {
-    title: "The Awakening",
-    author: "Kate Chopin",
-  },
-  {
-    title: "City of Glass",
-    author: "Paul Auster",
-  },
-];
-//// Resolvers define how to fetch the types defined in your schema.
+export let gridFSBucket: GridFSBucket;
 
-//// This resolver retrieves books from the "books" array above.
-
-const resolvers = {
-  Query: {
-    books: () => books,
-  },
-};
-
-renderText(3);
-//// The ApolloServer constructor requires two parameters: your schema
-
-//// definition and your set of resolvers.
-
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
+const conn = mongoose.connection;
+conn.once("open", () => {
+  gridFSBucket = new mongoose.mongo.GridFSBucket(conn.db, {
+    bucketName: PHOTOS_BUCKET_NAME,
+  });
 });
 
-//// Passing an ApolloServer instance to the `startStandaloneServer` function:
+const app = express();
 
-////  1. creates an Express app
+const httpServer = http.createServer(app);
 
-////  2. installs your ApolloServer instance as middleware
+const server = new ApolloServer<Context>({
+  typeDefs,
+  resolvers,
+  status400ForVariableCoercionErrors: true,
+  plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  csrfPrevention: false, // TODO: set this to true and header Apollo-Require-Preflight': 'true' in apollo--upload-client on frontend
+});
 
-////  3. prepares your app to handle incoming requests
+app.use(graphqlUploadExpress());
 
-startStandaloneServer(server, {
-  listen: { port: 4000 },
-})
-  .then(({ url }) => {
-    console.log(`🚀  Server ready at: ${url}`);
+app.use(
+  cors<cors.CorsRequest>({
+    origin: "*", // you can put "*" or ["http://localhost:3000"] but ["*"] won't work and front will receive `NetworkError when attempting to fetch resource.` error
+  })
+);
+app.use(json());
+
+server
+  .start()
+  .then(() => {
+    app.use(
+      "/graphql",
+      expressMiddleware(server, {
+        context,
+      })
+    );
+
+    app.get("/", (req, res) =>
+      res.status(200).json({
+        message: `Witamy na serverze. Przejdź pod "/graphql", aby sprawdzić dostępne query i mutacje lub przejdź pod "/files/<id>", aby otrzymać zdjęcie`,
+      })
+    );
+
+    app.get("/files/:id", (req, res) => {
+      // this endpoint will produce error if it is applied onto Router and not directly here
+      PhotoFileModel.findOne({ _id: req.params.id })
+        .exec()
+        .then((file) => {
+          if (file === undefined || file === null) {
+            return res.status(404).json({
+              message: COMMON_MESSAGES.NOT_FOUND_FN("pliku"),
+            });
+          }
+
+          //  below line produces an error when you build server via `yarn build` and run via `yarn start`.
+          const readStream = gridFSBucket.openDownloadStream(file._id);
+          readStream.pipe(res);
+        })
+        .catch((error) => {
+          res.status(500).json({
+            message: COMMON_MESSAGES.AN_ERROR_OCCURED,
+            error,
+          });
+        });
+    });
+
+    mongoose
+      .connect(MONGO_DB_URI, {
+        retryWrites: true,
+        w: "majority",
+      })
+      .then(() => {
+        // eslint-disable-next-line no-console
+        console.log(`Connected to MongoDB!`);
+
+        httpServer.listen({ port: +PORT }, () => {
+          // eslint-disable-next-line no-console
+          console.log(`Server ready at: http://localhost:${+PORT}/graphql`);
+        });
+      })
+      .catch((err) => {
+        // eslint-disable-next-line no-console
+        console.log(err);
+      });
   })
   .catch((error) => {
+    // eslint-disable-next-line no-console
     console.log("error: ", error);
   });

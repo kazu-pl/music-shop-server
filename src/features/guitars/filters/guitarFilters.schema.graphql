@@ -1,0 +1,78 @@
+enum GuitarFilterTypeEnum {
+  AVAILABILITY
+  BODY_WOOD
+  BRIDGE
+  FINGERBOARD_WOOD
+  GUITAR_TYPE
+  PICKUPS_SET
+  PRODUCER
+  SHAPE
+}
+
+type GuitarFilter {
+  _id: ID!
+  name: String!
+  description: String
+  type: GuitarFilterTypeEnum!
+}
+
+type GuitarFiltersList {
+  data: [GuitarFilter!]!
+  totalItems: Int!
+}
+
+input AddGuitarFilterInput {
+  name: String!
+  description: String
+  type: GuitarFilterTypeEnum!
+}
+
+input UpdateGuitarFilterInput {
+  id: ID!
+  name: String!
+  description: String!
+  type: GuitarFilterTypeEnum!
+}
+
+type Query {
+  """
+  **PROTECTED**
+  -
+  **ONLY FOR ADMIN**
+  """
+  getGuitarFilters(
+    offset: Int
+    limit: Int
+    type: GuitarFilterTypeEnum!
+  ): GuitarFiltersList!
+
+  """
+  **PROTECTED**
+  -
+  **ONLY FOR ADMIN**
+  """
+  getGuitarFilter(id: ID!): GuitarFilter!
+}
+
+type Mutation {
+  """
+  **PROTECTED**
+  -
+  **ONLY FOR ADMIN**
+  """
+  addGuitarFilter(newGuitarFilter: AddGuitarFilterInput!): SuccessfulReqMsg!
+
+  """
+  **PROTECTED**
+  -
+  **ONLY FOR ADMIN**
+  """
+  updateGuitarFilter(guitarFilter: UpdateGuitarFilterInput!): SuccessfulReqMsg!
+
+  """
+  **PROTECTED**
+  -
+  **ONLY FOR ADMIN**
+  """
+  removeGuitarFilter(id: ID!): SuccessfulReqMsg!
+}

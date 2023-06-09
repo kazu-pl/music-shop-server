@@ -7,19 +7,38 @@
     "compile": "tsc",
     "start_originalScriptFromApolloDocs": "npm run compile && node ./dist/index.js",
     "dev": "ts-node-dev -r tsconfig-paths/register src/index.ts",
-    "build": "rm -rf build && tsc",
-    "start": "node -r ts-node/register/transpile-only -r tsconfig-paths/register build/index.js"
+    "build": "rm -rf build && tsc && yarn copy-files",
+    "start": "node -r ts-node/register/transpile-only -r tsconfig-paths/register build/src/index.js",
+    "codegen": "graphql-codegen --config codegen.ts",
+    "copy-files": "copyfiles -u 1 src/**/*.graphql build/src"
   },
   "dependencies": {
     "@apollo/server": "^4.7.1",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dataloader": "^2.2.2",
+    "dotenv": "^16.0.3",
     "graphql": "^16.6.0",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.1.0",
+    "object-path": "^0.11.8",
     "ts-node-dev": "^1.1.8",
-    "tsconfig-paths": "^3.11.0"
+    "tsconfig-paths": "^3.11.0",
+    "yup": "^1.1.1"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "3.3.1",
+    "@graphql-codegen/introspection": "3.0.1",
+    "@graphql-codegen/typescript": "3.0.4",
+    "@graphql-codegen/typescript-document-nodes": "3.0.4",
+    "@graphql-codegen/typescript-resolvers": "3.2.1",
+    "@types/bcryptjs": "^2.4.2",
+    "@types/cors": "^2.8.13",
+    "@types/jsonwebtoken": "^9.0.2",
     "@types/node": "^20.0.0",
     "@typescript-eslint/eslint-plugin": "^5.59.2",
     "@typescript-eslint/parser": "^5.59.2",
+    "copyfiles": "^2.4.1",
     "eslint": "^8.39.0",
     "typescript": "^5.0.4"
   }

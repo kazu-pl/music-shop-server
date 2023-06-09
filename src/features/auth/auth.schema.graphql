@@ -1,0 +1,87 @@
+type Tokens {
+  """
+  Description for field
+  Supports **multi-line** description for your [API](http://example.com)!
+  """
+  accessToken: String!
+  "Description for argument"
+  refreshToken: String!
+}
+
+type AccessTokenResponse {
+  accessToken: String!
+}
+
+input LoginCredentialsInput {
+  email: String!
+  password: String!
+}
+
+input User {
+  name: String!
+  surname: String!
+  email: String!
+  phone: Int!
+  street: String!
+  streetNumber: String!
+  postalCode: String!
+  city: String!
+}
+
+type UserType {
+  name: String!
+  surname: String!
+  email: String!
+  phone: Int!
+  street: String!
+  streetNumber: String!
+  postalCode: String!
+  city: String!
+}
+
+input RegisterCredentialsInput {
+  data: User!
+  password: String!
+}
+
+input RefreshTokenInput {
+  refreshToken: String!
+}
+
+input newPasswordInput {
+  oldPassword: String!
+  newPassword: String!
+}
+
+type Query {
+  """
+  **PROTECTED**
+  """
+  getUserData: UserType!
+  """
+  **PROTECTED**
+  """
+  removeUser: SuccessfulReqMsg!
+}
+
+type Mutation {
+  """
+  Description for field
+  Supports **multi-line** description for your [API](http://example.com)!
+  """
+  register(registerCredentials: RegisterCredentialsInput!): SuccessfulReqMsg!
+
+  "use this mutation to send email and password and get JWT tokens"
+  login(loginCredentials: LoginCredentialsInput!): Tokens!
+
+  "use this to get new accessToken if yours expired. Pass refreshToken to obtain accessToken"
+  renewAccessToken(refreshCredentials: RefreshTokenInput!): AccessTokenResponse!
+  """
+  **PROTECTED**
+  """
+  updateUserData(data: User!): SuccessfulReqMsg!
+  """
+  **PROTECTED**
+  """
+  updateUserPassword(newPasswordInput: newPasswordInput!): SuccessfulReqMsg!
+}
