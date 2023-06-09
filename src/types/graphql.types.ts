@@ -347,7 +347,6 @@ export type PriceRange = {
 
 export type Query = {
   __typename?: 'Query';
-  /** **PROTECTED** */
   getGuitar: Guitar;
   /**
    * **PROTECTED**
@@ -361,13 +360,9 @@ export type Query = {
    * **ONLY FOR ADMIN**
    */
   getGuitarFilters: GuitarFiltersList;
-  /** **PROTECTED** */
   getGuitars: GuitarsList;
-  /** **PROTECTED** */
   getGuitarsPopulated: GuitarsListPopulated;
-  /** **PROTECTED** */
   getGuitarsPopulatedOptionally: GuitarsListPopulated;
-  /** **PROTECTED** */
   getGuitarsWithDataLoader: GuitarsListWithdataLoder;
   /** **PROTECTED** */
   getUserData: UserType;

@@ -48,11 +48,13 @@ which means that graphql files really didn't get copied. To solve this, the easi
 
 so you can update the whole build command like this:
 
-Build Command: `yarn && rm -rf build && tsc && cp src/features/auth/auth.schema.graphql build/src/features/auth && cp src/features/guitars/guitar.schema.graphql build/src/features/guitars && cp src/features/guitars/filters/guitarFilters.schema.graphql build/src/features/guitars/filters && cp src/common/schema.common.graphql build/src/common`
+Build Command: `yarn && yarn codegen && rm -rf build && tsc && cp src/features/auth/auth.schema.graphql build/src/features/auth && cp src/features/guitars/guitar.schema.graphql build/src/features/guitars && cp src/features/guitars/filters/guitarFilters.schema.graphql build/src/features/guitars/filters && cp src/common/schema.common.graphql build/src/common`
 
 # Render.com settings, like Build command, changing Node Version and so on:
 
-Build Command: `yarn && rm -rf build && tsc`
+<!-- with build command you first install dependencies with `yarn`, then creates schema for server with `yarn codegen`and then build server with `rm -rf build && tsc` -->
+
+Build Command: `yarn && yarn codegen && rm -rf build && tsc`
 Start Command: `ls && node -r ts-node/register/transpile-only -r tsconfig-paths/register build/src/index.js`
 
 Changing Node version:

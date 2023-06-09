@@ -8,7 +8,11 @@ import cors from "cors";
 import { ApolloServer } from "@apollo/server";
 
 import mongoose from "mongoose";
-import { MONGO_DB_URI, PORT } from "constants/env";
+import {
+  ENABLE_GRAPHQL_STUDIO_FOR_SHOWCASE_IN_PROD,
+  MONGO_DB_URI,
+  PORT,
+} from "constants/env";
 
 import context, { Context } from "./context";
 import resolvers from "./resolvers";
@@ -40,9 +44,15 @@ const server = new ApolloServer<Context>({
   status400ForVariableCoercionErrors: true,
   plugins: [
     ApolloServerPluginDrainHttpServer({ httpServer }),
-    ApolloServerPluginLandingPageLocalDefault({ footer: false }), // by default you don't need this plugin as Apollo runs ApolloServerPluginLandingPageLocalDefault in dev and ApolloServerPluginLandingPageProductionDefault in prod but if you always want to use dev landing page even in production you can add this plugin
+    ...(ENABLE_GRAPHQL_STUDIO_FOR_SHOWCASE_IN_PROD
+      ? [ApolloServerPluginLandingPageLocalDefault({ footer: false })]
+      : []), // usually you shouldn't allow to show ApolloServerPluginLandingPageLocalDefault page in production but for school projects it's okay to show it the instructor
   ],
-  csrfPrevention: false, // TODO: set this to true and header Apollo-Require-Preflight': 'true' in apollo--upload-client on frontend
+  csrfPrevention: false, // TODO: set this to true and add header Apollo-Require-Preflight': 'true' in apollo-upload-client on frontend
+
+  ...(ENABLE_GRAPHQL_STUDIO_FOR_SHOWCASE_IN_PROD && {
+    introspection: true, // this should NOT be set to true in prod mode but just for school project it's okay
+  }),
 });
 
 app.use(graphqlUploadExpress());
