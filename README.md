@@ -1,3 +1,76 @@
+# Error `Unable to find any GraphQL type definitions for the following pointers`
+
+if you get error like the following (mostly on `render.com`):
+
+```powershell
+Jun 9 02:02:22 PM  /opt/render/project/src/node_modules/@graphql-tools/load/cjs/load-typedefs.js:93
+Jun 9 02:02:22 PM          throw new Error(`
+Jun 9 02:02:22 PM                ^
+Jun 9 02:02:22 PM  Error:
+Jun 9 02:02:22 PM        Unable to find any GraphQL type definitions for the following pointers:
+Jun 9 02:02:22 PM
+Jun 9 02:02:22 PM            - /opt/render/project/src/build/src/common/schema.common.graphql
+Jun 9 02:02:22 PM            ,
+Jun 9 02:02:22 PM            - /opt/render/project/src/build/src/features/auth/auth.schema.graphql
+Jun 9 02:02:22 PM            ,
+Jun 9 02:02:22 PM            - /opt/render/project/src/build/src/features/guitars/filters/guitarFilters.schema.graphql
+Jun 9 02:02:22 PM            ,
+Jun 9 02:02:22 PM            - /opt/render/project/src/build/src/features/guitars/guitar.schema.graphql
+Jun 9 02:02:22 PM
+Jun 9 02:02:22 PM      at prepareResult (/opt/render/project/src/node_modules/@graphql-tools/load/cjs/load-typedefs.js:93:15)
+Jun 9 02:02:22 PM      at loadTypedefsSync (/opt/render/project/src/node_modules/@graphql-tools/load/cjs/load-typedefs.js:79:20)
+Jun 9 02:02:22 PM      at loadSchemaSync (/opt/render/project/src/node_modules/@graphql-tools/load/cjs/schema.js:28:61)
+Jun 9 02:02:22 PM      at Object.<anonymous> (/opt/render/project/src/build/src/typeDefs.js:10:44)
+Jun 9 02:02:22 PM      at Module._compile (internal/modules/cjs/loader.js:1085:14)
+Jun 9 02:02:22 PM      at Module.m._compile (/opt/render/project/src/node_modules/ts-node/src/index.ts:1056:23)
+Jun 9 02:02:22 PM      at Module._extensions..js (internal/modules/cjs/loader.js:1114:10)
+Jun 9 02:02:22 PM      at Object.require.extensions.<computed> [as .js] (/opt/render/project/src/node_modules/ts-node/src/index.ts:1059:12)
+Jun 9 02:02:22 PM      at Module.load (internal/modules/cjs/loader.js:950:32)
+Jun 9 02:02:22 PM      at Function.Module._load (internal/modules/cjs/loader.js:790:12)
+```
+
+then it means graphql files were not copied and can't be found when trying to run project.
+
+on `render.com` you can check if they exist by modyfing start script like this:
+
+Start Command: `cd build/src/features/auth && ls ....`
+
+which would print you:
+
+```
+Jun 9 02:02:02 PM  auth.resolvers.js
+Jun 9 02:02:02 PM  models
+```
+
+which means that graphql files really didn't get copied. To solve this, the easiest way is to manually copy all of them by modyfing build script like `cp src/features/auth/auth.schema.graphql build/src/features/auth` and you do this for all graphql files which gives you in total:
+
+`cp src/features/auth/auth.schema.graphql build/src/features/auth && cp src/features/guitars/guitar.schema.graphql build/src/features/guitars && cp src/features/guitars/filters/guitarFilters.schema.graphql build/src/features/guitars/filters && cp src/common/schema.common.graphql build/src/common`
+
+so you can update the whole build command like this:
+
+Build Command: `yarn && rm -rf build && tsc && cp src/features/auth/auth.schema.graphql build/src/features/auth && cp src/features/guitars/guitar.schema.graphql build/src/features/guitars && cp src/features/guitars/filters/guitarFilters.schema.graphql build/src/features/guitars/filters && cp src/common/schema.common.graphql build/src/common`
+
+# Render.com settings, like Build command, changing Node Version and so on:
+
+Build Command: `yarn && rm -rf build && tsc`
+Start Command: `ls && node -r ts-node/register/transpile-only -r tsconfig-paths/register build/src/index.js`
+
+Changing Node version:
+
+If diring the deploy you see error like this:
+
+```powershell
+Jun 9 01:35:32 PM  error bson@5.2.0: The engine "node" is incompatible with this module. Expected version ">=14.20.1". Got "14.17.0"
+Jun 9 01:35:32 PM  error Found incompatible module.
+Jun 9 01:35:32 PM  info Visit https://yarnpkg.com/en/docs/cli/install for documentation about this command.
+Jun 9 01:35:32 PM  ==> Build failed 😞
+
+```
+
+then it means the node version used by render is incorrect. Render by default uses node `4.17.5`. there are several ways to change it, and the easiest one is to set env variable called `NODE_VERSION` specifing the node version.
+
+found [here](https://render.com/docs/node-version)
+
 # How to check if frontend quered for some field and optionally / conditionally populate data:
 
 ```ts
