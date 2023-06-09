@@ -246,6 +246,8 @@ export type Mutation = {
    * remove guitar image
    */
   removeGuitarImage: SuccessfulReqMsg;
+  /** **PROTECTED** */
+  removeUser: SuccessfulReqMsg;
   /** use this to get new accessToken if yours expired. Pass refreshToken to obtain accessToken */
   renewAccessToken: AccessTokenResponse;
   /**
@@ -366,8 +368,6 @@ export type Query = {
   getGuitarsWithDataLoader: GuitarsListWithdataLoder;
   /** **PROTECTED** */
   getUserData: UserType;
-  /** **PROTECTED** */
-  removeUser: SuccessfulReqMsg;
 };
 
 
@@ -795,6 +795,7 @@ export type MutationResolvers<ContextType = Context, ParentType extends Resolver
   removeGuitar?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationRemoveGuitarArgs, 'id'>>;
   removeGuitarFilter?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationRemoveGuitarFilterArgs, 'id'>>;
   removeGuitarImage?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationRemoveGuitarImageArgs, 'guitarId'>>;
+  removeUser?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType>;
   renewAccessToken?: Resolver<ResolversTypes['AccessTokenResponse'], ParentType, ContextType, RequireFields<MutationRenewAccessTokenArgs, 'refreshCredentials'>>;
   updateGuitar?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationUpdateGuitarArgs, 'guitar'>>;
   updateGuitarFilter?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationUpdateGuitarFilterArgs, 'guitarFilter'>>;
@@ -812,7 +813,6 @@ export type QueryResolvers<ContextType = Context, ParentType extends ResolversPa
   getGuitarsPopulatedOptionally?: Resolver<ResolversTypes['GuitarsListPopulated'], ParentType, ContextType, RequireFields<QueryGetGuitarsPopulatedOptionallyArgs, 'sort'>>;
   getGuitarsWithDataLoader?: Resolver<ResolversTypes['GuitarsListWithdataLoder'], ParentType, ContextType, RequireFields<QueryGetGuitarsWithDataLoaderArgs, 'sort'>>;
   getUserData?: Resolver<ResolversTypes['UserType'], ParentType, ContextType>;
-  removeUser?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType>;
 };
 
 export type SuccessfulReqMsgResolvers<ContextType = Context, ParentType extends ResolversParentTypes['SuccessfulReqMsg'] = ResolversParentTypes['SuccessfulReqMsg']> = {
