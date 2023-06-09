@@ -19,6 +19,10 @@ import PhotoChunkModel from "common/models/PhotoChunk.model";
 import mongoose from "mongoose";
 import getGuitarFiltersFromDataLoader from "./utils/getGuitarFiltersFromDataLoader";
 import getGuitarsQueryResolver from "./utils/getGuitarsQueryResolver";
+import getSortBy from "utils/db/getSortBy";
+import getFilters from "utils/db/getFilters";
+import getSortOrder from "utils/db/getSortOrder";
+import checkIfGivenMemberIsQuered from "../../utils/checkIfGivenMemberIsQuered";
 
 const guitarResolvers: Resolvers = {
   Upload: GraphQLUpload,
@@ -79,6 +83,83 @@ const guitarResolvers: Resolvers = {
     },
   },
   Query: {
+    getGuitarsPopulatedOptionally: async (parent, args, context, info) => {
+      const { limit = 5, offset = 0, sort, filters } = args;
+
+      const sortBy = getSortBy(sort.sortBy);
+      const sortOrder = getSortOrder(sort.sortOrder);
+
+      const filtersToUse = getFilters(filters);
+
+      const isAvailabilityQuered = checkIfGivenMemberIsQuered(
+        info,
+        "availability"
+      );
+      const isBodyWoodQuered = checkIfGivenMemberIsQuered(info, "bodyWood");
+      const isBridgeQuered = checkIfGivenMemberIsQuered(info, "bridge");
+      const isFingerboardWoodQuered = checkIfGivenMemberIsQuered(
+        info,
+        "fingerboardWood"
+      );
+      const isGuitarTypeQuered = checkIfGivenMemberIsQuered(info, "guitarType");
+      const isPickupsSetQuered = checkIfGivenMemberIsQuered(info, "pickupsSet");
+      const isProducerQuered = checkIfGivenMemberIsQuered(info, "producer");
+      const isShapeQuered = checkIfGivenMemberIsQuered(info, "shape");
+
+      const promiseToGetData = GuitarModel.find({
+        ...filtersToUse,
+      });
+
+      if (isAvailabilityQuered) {
+        promiseToGetData.populate("availability");
+      }
+      if (isBodyWoodQuered) {
+        promiseToGetData.populate("bodyWood");
+      }
+      if (isBridgeQuered) {
+        promiseToGetData.populate("bridge");
+      }
+      if (isFingerboardWoodQuered) {
+        promiseToGetData.populate("fingerboardWood");
+      }
+      if (isGuitarTypeQuered) {
+        promiseToGetData.populate("guitarType");
+      }
+      if (isPickupsSetQuered) {
+        promiseToGetData.populate("pickupsSet");
+      }
+      if (isProducerQuered) {
+        promiseToGetData.populate("producer");
+      }
+      if (isShapeQuered) {
+        promiseToGetData.populate("shape");
+      }
+
+      const [data, totalItems] = await Promise.all([
+        promiseToGetData
+          .skip(offset as number)
+          .limit(limit as number)
+          .sort({ [sortBy]: sortOrder }), // 1 for asc, -1 for desc
+        GuitarModel.countDocuments({ ...filtersToUse }),
+      ]);
+
+      if (!data) {
+        throw new GraphQLError(COMMON_MESSAGES.AN_ERROR_OCCURED);
+      }
+      // eslint-disable-next-line no-console
+      console.log("- - - - - - - - - - - - - -");
+
+      // eslint-disable-next-line no-console
+      console.log(
+        `\x1b[33mSELECT ${totalItems} Guitars (with optionally populated fields) in list, with limit: ${limit}, offset: ${offset} \x1b[0m`
+      );
+
+      return {
+        data: data as unknown as GuitarPopulated[],
+        totalItems: totalItems || 0,
+      };
+    },
+
     getGuitarsPopulated: async (parent, args, context, info) =>
       getGuitarsQueryResolver<GuitarPopulated>(
         parent,

@@ -71,7 +71,7 @@ const getGuitarsQueryResolver = async <DataType>(
     mode === "dataLoader"
       ? "(with DataLoader) "
       : mode === "populated"
-      ? "(with populated fields) "
+      ? "(with populated all fields) "
       : "";
 
   // eslint-disable-next-line no-console
