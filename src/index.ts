@@ -19,6 +19,7 @@ import PhotoFileModel from "common/models/PhotoFile.model";
 import COMMON_MESSAGES from "constants/COMMON_MESSAGES";
 import { GridFSBucket } from "mongodb";
 import PHOTOS_BUCKET_NAME from "constants/PHOTOS_BUCKET_NAME";
+import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin/landingPage/default";
 
 export let gridFSBucket: GridFSBucket;
 
@@ -37,7 +38,10 @@ const server = new ApolloServer<Context>({
   typeDefs,
   resolvers,
   status400ForVariableCoercionErrors: true,
-  plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  plugins: [
+    ApolloServerPluginDrainHttpServer({ httpServer }),
+    ApolloServerPluginLandingPageLocalDefault({ footer: false }), // by default you don't need this plugin as Apollo runs ApolloServerPluginLandingPageLocalDefault in dev and ApolloServerPluginLandingPageProductionDefault in prod but if you always want to use dev landing page even in production you can add this plugin
+  ],
   csrfPrevention: false, // TODO: set this to true and header Apollo-Require-Preflight': 'true' in apollo--upload-client on frontend
 });
 
