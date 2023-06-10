@@ -13,9 +13,14 @@ const getGuitarsQueryResolver = async <DataType>(
   args: RequireFields<QueryGetGuitarsArgs, "sort">,
   context: Context,
   info: GraphQLResolveInfo,
-  mode?: "populated" | "dataLoader"
+  mode: "populated" | "dataLoader" | "default"
 ) => {
-  const { limit = 5, offset = 0, sort, filters } = args;
+  const {
+    limit = 5,
+    offset = 0,
+    sort,
+    filters: { ids, ...filters },
+  } = args;
 
   const sortBy = getSortBy(sort.sortBy);
   const sortOrder = getSortOrder(sort.sortOrder);
@@ -26,18 +31,24 @@ const getGuitarsQueryResolver = async <DataType>(
   let totalGuitarsNumber = 0;
 
   if (mode === "populated") {
+    const promiseToGetPopulatedData = GuitarModel.find({
+      ...filtersToUse,
+    })
+      .populate("availability") // add this if you want to get availablity filter instead of just its id
+      .populate("bodyWood")
+      .populate("bridge")
+      .populate("fingerboardWood")
+      .populate("guitarType")
+      .populate("pickupsSet")
+      .populate("producer")
+      .populate("shape");
+
+    if (ids) {
+      promiseToGetPopulatedData.where("_id").in([...ids]);
+    }
+
     const [data, totalItems] = await Promise.all([
-      GuitarModel.find({
-        ...filtersToUse,
-      })
-        .populate("availability") // add this if you want to get availablity filter instead of just its id
-        .populate("bodyWood")
-        .populate("bridge")
-        .populate("fingerboardWood")
-        .populate("guitarType")
-        .populate("pickupsSet")
-        .populate("producer")
-        .populate("shape")
+      promiseToGetPopulatedData
         .skip(offset as number)
         .limit(limit as number)
         .sort({ [sortBy]: sortOrder }), // 1 for asc, -1 for desc
@@ -47,10 +58,16 @@ const getGuitarsQueryResolver = async <DataType>(
     guitarList = data;
     totalGuitarsNumber = totalItems;
   } else {
+    // for default (with apollo default resolver) and dataLoader cases
+    const promiseToGetDataDefault = GuitarModel.find({
+      ...filtersToUse,
+    });
+    if (ids) {
+      promiseToGetDataDefault.where("_id").in([...ids]);
+    }
+
     const [data, totalItems] = await Promise.all([
-      GuitarModel.find({
-        ...filtersToUse,
-      })
+      promiseToGetDataDefault
         // .populate("availability") // add this if you want to get availablity filter instead of just its id
         .skip(offset as number)
         .limit(limit as number)
@@ -72,6 +89,8 @@ const getGuitarsQueryResolver = async <DataType>(
       ? "(with DataLoader) "
       : mode === "populated"
       ? "(with populated all fields) "
+      : mode === "default"
+      ? "(with default apollo resolver) "
       : "";
 
   // eslint-disable-next-line no-console
