@@ -63,6 +63,7 @@ export type GetGuitarsFilters = {
   fingerboardWood?: InputMaybe<Scalars['ID']>;
   /** Id of guitarType */
   guitarType?: InputMaybe<Scalars['ID']>;
+  ids?: InputMaybe<Array<Scalars['ID']>>;
   /** Id of pickupsSet */
   pickupsSet?: InputMaybe<Scalars['ID']>;
   price?: InputMaybe<PriceRange>;
@@ -389,33 +390,33 @@ export type QueryGetGuitarFiltersArgs = {
 
 
 export type QueryGetGuitarsArgs = {
-  filters?: InputMaybe<GetGuitarsFilters>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
+  filters: GetGuitarsFilters;
+  limit: Scalars['Int'];
+  offset: Scalars['Int'];
   sort: GetGuitarsSortInput;
 };
 
 
 export type QueryGetGuitarsPopulatedArgs = {
-  filters?: InputMaybe<GetGuitarsFilters>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
+  filters: GetGuitarsFilters;
+  limit: Scalars['Int'];
+  offset: Scalars['Int'];
   sort: GetGuitarsSortInput;
 };
 
 
 export type QueryGetGuitarsPopulatedOptionallyArgs = {
-  filters?: InputMaybe<GetGuitarsFilters>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
+  filters: GetGuitarsFilters;
+  limit: Scalars['Int'];
+  offset: Scalars['Int'];
   sort: GetGuitarsSortInput;
 };
 
 
 export type QueryGetGuitarsWithDataLoaderArgs = {
-  filters?: InputMaybe<GetGuitarsFilters>;
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
+  filters: GetGuitarsFilters;
+  limit: Scalars['Int'];
+  offset: Scalars['Int'];
   sort: GetGuitarsSortInput;
 };
 
@@ -808,10 +809,10 @@ export type QueryResolvers<ContextType = Context, ParentType extends ResolversPa
   getGuitar?: Resolver<ResolversTypes['Guitar'], ParentType, ContextType, RequireFields<QueryGetGuitarArgs, 'id'>>;
   getGuitarFilter?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType, RequireFields<QueryGetGuitarFilterArgs, 'id'>>;
   getGuitarFilters?: Resolver<ResolversTypes['GuitarFiltersList'], ParentType, ContextType, RequireFields<QueryGetGuitarFiltersArgs, 'type'>>;
-  getGuitars?: Resolver<ResolversTypes['GuitarsList'], ParentType, ContextType, RequireFields<QueryGetGuitarsArgs, 'sort'>>;
-  getGuitarsPopulated?: Resolver<ResolversTypes['GuitarsListPopulated'], ParentType, ContextType, RequireFields<QueryGetGuitarsPopulatedArgs, 'sort'>>;
-  getGuitarsPopulatedOptionally?: Resolver<ResolversTypes['GuitarsListPopulated'], ParentType, ContextType, RequireFields<QueryGetGuitarsPopulatedOptionallyArgs, 'sort'>>;
-  getGuitarsWithDataLoader?: Resolver<ResolversTypes['GuitarsListWithdataLoder'], ParentType, ContextType, RequireFields<QueryGetGuitarsWithDataLoaderArgs, 'sort'>>;
+  getGuitars?: Resolver<ResolversTypes['GuitarsList'], ParentType, ContextType, RequireFields<QueryGetGuitarsArgs, 'filters' | 'limit' | 'offset' | 'sort'>>;
+  getGuitarsPopulated?: Resolver<ResolversTypes['GuitarsListPopulated'], ParentType, ContextType, RequireFields<QueryGetGuitarsPopulatedArgs, 'filters' | 'limit' | 'offset' | 'sort'>>;
+  getGuitarsPopulatedOptionally?: Resolver<ResolversTypes['GuitarsListPopulated'], ParentType, ContextType, RequireFields<QueryGetGuitarsPopulatedOptionallyArgs, 'filters' | 'limit' | 'offset' | 'sort'>>;
+  getGuitarsWithDataLoader?: Resolver<ResolversTypes['GuitarsListWithdataLoder'], ParentType, ContextType, RequireFields<QueryGetGuitarsWithDataLoaderArgs, 'filters' | 'limit' | 'offset' | 'sort'>>;
   getUserData?: Resolver<ResolversTypes['UserType'], ParentType, ContextType>;
 };
 

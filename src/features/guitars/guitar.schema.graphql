@@ -142,6 +142,7 @@ input PriceRange {
 }
 
 input GetGuitarsFilters {
+  ids: [ID!]
   price: PriceRange
   stringsNumber: Int
   """
@@ -188,31 +189,31 @@ type File {
 
 type Query {
   getGuitars(
-    offset: Int
-    limit: Int
+    offset: Int!
+    limit: Int!
     sort: GetGuitarsSortInput!
-    filters: GetGuitarsFilters
+    filters: GetGuitarsFilters!
   ): GuitarsList!
 
   getGuitarsWithDataLoader(
-    offset: Int
-    limit: Int
+    offset: Int!
+    limit: Int!
     sort: GetGuitarsSortInput!
-    filters: GetGuitarsFilters
+    filters: GetGuitarsFilters!
   ): GuitarsListWithdataLoder!
 
   getGuitarsPopulated(
-    offset: Int
-    limit: Int
+    offset: Int!
+    limit: Int!
     sort: GetGuitarsSortInput!
-    filters: GetGuitarsFilters
+    filters: GetGuitarsFilters!
   ): GuitarsListPopulated!
 
   getGuitarsPopulatedOptionally(
-    offset: Int
-    limit: Int
+    offset: Int!
+    limit: Int!
     sort: GetGuitarsSortInput!
-    filters: GetGuitarsFilters
+    filters: GetGuitarsFilters!
   ): GuitarsListPopulated!
 
   getGuitar(id: ID!): Guitar!
