@@ -84,7 +84,12 @@ const guitarResolvers: Resolvers = {
   },
   Query: {
     getGuitarsPopulatedOptionally: async (parent, args, context, info) => {
-      const { limit = 5, offset = 0, sort, filters } = args;
+      const {
+        limit = 5,
+        offset = 0,
+        sort,
+        filters: { ids, ...filters },
+      } = args;
 
       const sortBy = getSortBy(sort.sortBy);
       const sortOrder = getSortOrder(sort.sortOrder);
@@ -109,6 +114,10 @@ const guitarResolvers: Resolvers = {
       const promiseToGetData = GuitarModel.find({
         ...filtersToUse,
       });
+
+      if (ids) {
+        promiseToGetData.where("_id").in([...ids]);
+      }
 
       if (isAvailabilityQuered) {
         promiseToGetData.populate("availability");
@@ -179,7 +188,7 @@ const guitarResolvers: Resolvers = {
       ),
 
     getGuitars: async (parent, args, context, info) =>
-      getGuitarsQueryResolver<Guitar>(parent, args, context, info),
+      getGuitarsQueryResolver<Guitar>(parent, args, context, info, "default"),
 
     getGuitar: async (parent, args) => {
       const { id } = args;
