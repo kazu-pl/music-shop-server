@@ -48,7 +48,7 @@ const server = new ApolloServer<Context>({
       ? [ApolloServerPluginLandingPageLocalDefault({ footer: false })]
       : []), // usually you shouldn't allow to show ApolloServerPluginLandingPageLocalDefault page in production but for school projects it's okay to show it the instructor
   ],
-  csrfPrevention: false, // TODO: set this to true and add header Apollo-Require-Preflight': 'true' in apollo-upload-client on frontend
+  // csrfPrevention: false, // set this to true (or comment) and add header Apollo-Require-Preflight': 'true' in apollo-upload-client on frontend to enable uploadig files but still keep csrf prevention
 
   ...(ENABLE_GRAPHQL_STUDIO_FOR_SHOWCASE_IN_PROD && {
     introspection: true, // this should NOT be set to true in prod mode but just for school project it's okay
