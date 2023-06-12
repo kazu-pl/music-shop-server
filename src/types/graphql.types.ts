@@ -383,8 +383,8 @@ export type QueryGetGuitarFilterArgs = {
 
 
 export type QueryGetGuitarFiltersArgs = {
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
+  limit: Scalars['Int'];
+  offset: Scalars['Int'];
   type: GuitarFilterTypeEnum;
 };
 
@@ -808,7 +808,7 @@ export type MutationResolvers<ContextType = Context, ParentType extends Resolver
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   getGuitar?: Resolver<ResolversTypes['Guitar'], ParentType, ContextType, RequireFields<QueryGetGuitarArgs, 'id'>>;
   getGuitarFilter?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType, RequireFields<QueryGetGuitarFilterArgs, 'id'>>;
-  getGuitarFilters?: Resolver<ResolversTypes['GuitarFiltersList'], ParentType, ContextType, RequireFields<QueryGetGuitarFiltersArgs, 'type'>>;
+  getGuitarFilters?: Resolver<ResolversTypes['GuitarFiltersList'], ParentType, ContextType, RequireFields<QueryGetGuitarFiltersArgs, 'limit' | 'offset' | 'type'>>;
   getGuitars?: Resolver<ResolversTypes['GuitarsList'], ParentType, ContextType, RequireFields<QueryGetGuitarsArgs, 'filters' | 'limit' | 'offset' | 'sort'>>;
   getGuitarsPopulated?: Resolver<ResolversTypes['GuitarsListPopulated'], ParentType, ContextType, RequireFields<QueryGetGuitarsPopulatedArgs, 'filters' | 'limit' | 'offset' | 'sort'>>;
   getGuitarsPopulatedOptionally?: Resolver<ResolversTypes['GuitarsListPopulated'], ParentType, ContextType, RequireFields<QueryGetGuitarsPopulatedOptionallyArgs, 'filters' | 'limit' | 'offset' | 'sort'>>;

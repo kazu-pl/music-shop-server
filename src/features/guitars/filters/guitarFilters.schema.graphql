@@ -41,8 +41,8 @@ type Query {
   **ONLY FOR ADMIN**
   """
   getGuitarFilters(
-    offset: Int
-    limit: Int
+    offset: Int!
+    limit: Int!
     type: GuitarFilterTypeEnum!
   ): GuitarFiltersList!
 
