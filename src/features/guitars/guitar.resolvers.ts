@@ -33,28 +33,29 @@ const guitarResolvers: Resolvers = {
         parent.availability as unknown as mongoose.Types.ObjectId
       ).toHexString(); // get _id string value instead of New ObjectId("...")
 
-      return await context.loaders.availabilityLoader.load(id);
+      return await context.loaders.availability.load(id);
     },
     bodyWood: async (parent, args, context) =>
-      getGuitarFiltersFromDataLoader(parent, context, "bodyWoodLoader"),
+      getGuitarFiltersFromDataLoader(parent, context, "bodyWood"),
 
     bridge: async (parent, args, context) =>
-      getGuitarFiltersFromDataLoader(parent, context, "bridgeLoader"),
+      getGuitarFiltersFromDataLoader(parent, context, "bridge"),
 
     fingerboardWood: async (parent, args, context) =>
-      getGuitarFiltersFromDataLoader(parent, context, "fingerboardWoodLoader"),
+      getGuitarFiltersFromDataLoader(parent, context, "fingerboardWood"),
 
     guitarType: async (parent, args, context) =>
-      getGuitarFiltersFromDataLoader(parent, context, "guitarTypeLoader"),
+      getGuitarFiltersFromDataLoader(parent, context, "guitarType"),
 
     pickupsSet: async (parent, args, context) =>
-      getGuitarFiltersFromDataLoader(parent, context, "pickupsSetLoader"),
+      getGuitarFiltersFromDataLoader(parent, context, "pickupsSet"),
 
-    producer: async (parent, args, context) =>
-      getGuitarFiltersFromDataLoader(parent, context, "producerLoader"),
+    producer: async (parent, args, context) => {
+      return getGuitarFiltersFromDataLoader(parent, context, "producer");
+    },
 
     shape: async (parent, args, context) =>
-      getGuitarFiltersFromDataLoader(parent, context, "shapeLoaderLoader"),
+      getGuitarFiltersFromDataLoader(parent, context, "shape"),
   },
   Guitar: {
     availability: async (parent) => {
