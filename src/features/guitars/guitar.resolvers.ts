@@ -31,6 +31,7 @@ const guitarResolvers: Resolvers = {
 
   GuitarWithDataLoader: {
     availability: async (parent, args, context) => {
+      // here I could just return getGuitarFiltersFromDataLoader(parent, context, "availability"), but I just pasted its logic just to make it explicitly clear what it does
       const id = (
         parent.availability as unknown as mongoose.Types.ObjectId
       ).toHexString(); // get _id string value instead of New ObjectId("...")
