@@ -91,7 +91,7 @@ const guitarResolvers: Resolvers = {
         limit = 5,
         offset = 0,
         sort,
-        filters: { ids, ...filters },
+        filters: { ids, fretsNumber, scaleLength, ...filters },
       } = args;
 
       const sortBy = getSortBy(sort.sortBy);
@@ -147,12 +147,24 @@ const guitarResolvers: Resolvers = {
         promiseToGetData.populate("shape");
       }
 
+      if (fretsNumber) {
+        promiseToGetData.where("fretsNumber").equals(fretsNumber);
+      }
+
+      if (scaleLength) {
+        promiseToGetData.where("scaleLength").equals(scaleLength);
+      }
+
       const [data, totalItems] = await Promise.all([
         promiseToGetData
           .skip(offset as number)
           .limit(limit as number)
           .sort({ [sortBy]: sortOrder }), // 1 for asc, -1 for desc
-        GuitarModel.countDocuments({ ...filtersToUse }),
+        ids
+          ? GuitarModel.countDocuments({ ...filtersToUse })
+              .where("_id")
+              .in([...ids])
+          : GuitarModel.countDocuments({ ...filtersToUse }),
       ]);
 
       if (!data) {

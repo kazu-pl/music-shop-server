@@ -150,8 +150,8 @@ input GetGuitarsFilters {
   ids: [ID!]
   price: PriceRange
   stringsNumber: Int
-  fretsNumber: Int # TODO: dodać scaleLength oraz fretsNumber
-  scaleLength: Float # TODO: dodać scaleLength oraz fretsNumber
+  fretsNumber: Int
+  scaleLength: Float
   """
   Id of producer
   """
