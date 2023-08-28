@@ -23,6 +23,8 @@ import getSortBy from "utils/db/getSortBy";
 import getFilters from "utils/db/getFilters";
 import getSortOrder from "utils/db/getSortOrder";
 import checkIfGivenMemberIsQuered from "../../utils/checkIfGivenMemberIsQuered";
+import UserModel from "features/auth/models/User.model";
+import AUTH_MESSAGES from "constants/AUTH_MESSAGES";
 
 const guitarResolvers: Resolvers = {
   Upload: GraphQLUpload,
@@ -204,6 +206,22 @@ const guitarResolvers: Resolvers = {
 
       return guitar as unknown as Guitar; // in fact this field will return keys from model kept in db like `producer` which is prodicer filter id but the type Guitar wants me to return real Filter (whic is returned in guitar.producer resolver) so I have to cast it as unknown and then as Guitar to let the typescript accept it
     },
+    getGuitarsFromWishlist: async (parent, args, context) => {
+      checkAuthentication(context.user);
+      // mam w stashu zmiany dotyczące fretsNumber itd
+      const user = await UserModel.findOne({
+        _id: context.user?._id,
+      }).exec();
+
+      if (!user) {
+        throw new GraphQLError(AUTH_MESSAGES.ACCOUNT_DOESNT_EXIST);
+      }
+
+      return {
+        data: (user.data.wishlist as unknown as string[]) || [],
+        totalItems: user.data.wishlist.length,
+      };
+    },
   },
 
   Mutation: {
@@ -365,6 +383,76 @@ const guitarResolvers: Resolvers = {
       try {
         await result.deleteOne();
         return { message: COMMON_MESSAGES.SUCCESSFULLY_REMOVED };
+      } catch (error) {
+        throw new GraphQLError(COMMON_MESSAGES.AN_ERROR_OCCURED);
+      }
+    },
+
+    addItemToWishlist: async (parent, args, context) => {
+      checkAuthentication(context.user);
+
+      const id = args.id;
+
+      const user = await UserModel.findOne({
+        _id: context.user?._id,
+      }).exec();
+
+      if (!user) {
+        throw new GraphQLError(AUTH_MESSAGES.ACCOUNT_DOESNT_EXIST);
+      }
+
+      if ((user.data.wishlist || []).includes(id)) {
+        return {
+          message: COMMON_MESSAGES.ALREADY_IN_WISHLIST,
+        };
+      }
+
+      try {
+        await user
+          .updateOne({
+            data: {
+              ...user.data,
+              wishlist: [...(user.data.wishlist || []), id],
+            },
+          })
+          .exec();
+
+        return {
+          message: COMMON_MESSAGES.ADDED_TO_WISHLIST,
+        };
+      } catch (error) {
+        throw new GraphQLError(COMMON_MESSAGES.AN_ERROR_OCCURED);
+      }
+    },
+
+    removeItemfromWishlist: async (parent, args, context) => {
+      checkAuthentication(context.user);
+
+      const id = args.id;
+
+      const user = await UserModel.findOne({
+        _id: context.user?._id,
+      }).exec();
+
+      if (!user) {
+        throw new GraphQLError(AUTH_MESSAGES.ACCOUNT_DOESNT_EXIST);
+      }
+
+      try {
+        await user
+          .updateOne({
+            data: {
+              ...user.data,
+              wishlist: (user.data.wishlist || []).filter(
+                (prevItem) => prevItem !== id
+              ),
+            },
+          })
+          .exec();
+
+        return {
+          message: COMMON_MESSAGES.REMOVED_FROM_WISHLIST,
+        };
       } catch (error) {
         throw new GraphQLError(COMMON_MESSAGES.AN_ERROR_OCCURED);
       }

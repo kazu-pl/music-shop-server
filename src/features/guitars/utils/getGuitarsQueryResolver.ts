@@ -52,7 +52,11 @@ const getGuitarsQueryResolver = async <DataType>(
         .skip(offset as number)
         .limit(limit as number)
         .sort({ [sortBy]: sortOrder }), // 1 for asc, -1 for desc
-      GuitarModel.countDocuments({ ...filtersToUse }),
+      ids
+        ? GuitarModel.countDocuments({ ...filtersToUse })
+            .where("_id")
+            .in([...ids])
+        : GuitarModel.countDocuments({ ...filtersToUse }),
     ]);
 
     guitarList = data;
@@ -72,7 +76,11 @@ const getGuitarsQueryResolver = async <DataType>(
         .skip(offset as number)
         .limit(limit as number)
         .sort({ [sortBy]: sortOrder }), // 1 for asc, -1 for desc
-      GuitarModel.countDocuments({ ...filtersToUse }),
+      ids
+        ? GuitarModel.countDocuments({ ...filtersToUse })
+            .where("_id")
+            .in([...ids])
+        : GuitarModel.countDocuments({ ...filtersToUse }),
     ]);
     guitarList = data;
     totalGuitarsNumber = totalItems;
