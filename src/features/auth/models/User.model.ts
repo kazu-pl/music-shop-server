@@ -11,6 +11,7 @@ export interface User extends Document {
     streetNumber: string;
     postalCode: string;
     city: string;
+    wishlist: string[];
   };
 }
 
