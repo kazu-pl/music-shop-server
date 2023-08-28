@@ -19,7 +19,7 @@ const getGuitarsQueryResolver = async <DataType>(
     limit = 5,
     offset = 0,
     sort,
-    filters: { ids, ...filters },
+    filters: { ids, fretsNumber, scaleLength, ...filters },
   } = args;
 
   const sortBy = getSortBy(sort.sortBy);
@@ -47,6 +47,14 @@ const getGuitarsQueryResolver = async <DataType>(
       promiseToGetPopulatedData.where("_id").in([...ids]);
     }
 
+    if (fretsNumber) {
+      promiseToGetPopulatedData.where("fretsNumber").equals(fretsNumber);
+    }
+
+    if (scaleLength) {
+      promiseToGetPopulatedData.where("scaleLength").equals(scaleLength);
+    }
+
     const [data, totalItems] = await Promise.all([
       promiseToGetPopulatedData
         .skip(offset as number)
@@ -68,6 +76,14 @@ const getGuitarsQueryResolver = async <DataType>(
     });
     if (ids) {
       promiseToGetDataDefault.where("_id").in([...ids]);
+    }
+
+    if (fretsNumber) {
+      promiseToGetDataDefault.where("fretsNumber").equals(fretsNumber);
+    }
+
+    if (scaleLength) {
+      promiseToGetDataDefault.where("scaleLength").equals(scaleLength);
     }
 
     const [data, totalItems] = await Promise.all([
