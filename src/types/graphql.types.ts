@@ -203,6 +203,18 @@ export type GuitarsListWithdataLoder = {
   totalItems: Scalars['Int'];
 };
 
+export type ItemFromCheckout = {
+  __typename?: 'ItemFromCheckout';
+  id: Scalars['ID'];
+  quantity: Scalars['Int'];
+};
+
+export type ItemsFromCheckout = {
+  __typename?: 'ItemsFromCheckout';
+  data: Array<ItemFromCheckout>;
+  totalItems: Scalars['Int'];
+};
+
 export type ItemsFromWishlist = {
   __typename?: 'ItemsFromWishlist';
   data: Array<Scalars['ID']>;
@@ -228,6 +240,8 @@ export type Mutation = {
    * **ONLY FOR ADMIN**
    */
   addGuitarFilter: SuccessfulReqMsg;
+  /** **PROTECTED** */
+  addItemToCheckout: SuccessfulReqMsg;
   /** **PROTECTED** */
   addItemToWishlist: SuccessfulReqMsg;
   /** use this mutation to send email and password and get JWT tokens */
@@ -257,6 +271,8 @@ export type Mutation = {
    * remove guitar image
    */
   removeGuitarImage: SuccessfulReqMsg;
+  /** **PROTECTED** */
+  removeItemfromCheckout: SuccessfulReqMsg;
   /** **PROTECTED** */
   removeItemfromWishlist: SuccessfulReqMsg;
   /** **PROTECTED** */
@@ -300,6 +316,11 @@ export type MutationAddGuitarFilterArgs = {
 };
 
 
+export type MutationAddItemToCheckoutArgs = {
+  id: Scalars['ID'];
+};
+
+
 export type MutationAddItemToWishlistArgs = {
   id: Scalars['ID'];
 };
@@ -327,6 +348,11 @@ export type MutationRemoveGuitarFilterArgs = {
 
 export type MutationRemoveGuitarImageArgs = {
   guitarId: Scalars['ID'];
+};
+
+
+export type MutationRemoveItemfromCheckoutArgs = {
+  id: Scalars['ID'];
 };
 
 
@@ -386,6 +412,7 @@ export type Query = {
    */
   getGuitarFilters: GuitarFiltersList;
   getGuitars: GuitarsList;
+  getGuitarsFromCheckout: ItemsFromCheckout;
   getGuitarsFromWishlist: ItemsFromWishlist;
   getGuitarsPopulated: GuitarsListPopulated;
   getGuitarsPopulatedOptionally: GuitarsListPopulated;
@@ -629,6 +656,8 @@ export type ResolversTypes = {
   GuitarsListWithdataLoder: ResolverTypeWrapper<GuitarsListWithdataLoder>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
+  ItemFromCheckout: ResolverTypeWrapper<ItemFromCheckout>;
+  ItemsFromCheckout: ResolverTypeWrapper<ItemsFromCheckout>;
   ItemsFromWishlist: ResolverTypeWrapper<ItemsFromWishlist>;
   LoginCredentialsInput: LoginCredentialsInput;
   Mutation: ResolverTypeWrapper<{}>;
@@ -671,6 +700,8 @@ export type ResolversParentTypes = {
   GuitarsListWithdataLoder: GuitarsListWithdataLoder;
   ID: Scalars['ID'];
   Int: Scalars['Int'];
+  ItemFromCheckout: ItemFromCheckout;
+  ItemsFromCheckout: ItemsFromCheckout;
   ItemsFromWishlist: ItemsFromWishlist;
   LoginCredentialsInput: LoginCredentialsInput;
   Mutation: {};
@@ -813,6 +844,18 @@ export type GuitarsListWithdataLoderResolvers<ContextType = Context, ParentType 
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type ItemFromCheckoutResolvers<ContextType = Context, ParentType extends ResolversParentTypes['ItemFromCheckout'] = ResolversParentTypes['ItemFromCheckout']> = {
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  quantity?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ItemsFromCheckoutResolvers<ContextType = Context, ParentType extends ResolversParentTypes['ItemsFromCheckout'] = ResolversParentTypes['ItemsFromCheckout']> = {
+  data?: Resolver<Array<ResolversTypes['ItemFromCheckout']>, ParentType, ContextType>;
+  totalItems?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type ItemsFromWishlistResolvers<ContextType = Context, ParentType extends ResolversParentTypes['ItemsFromWishlist'] = ResolversParentTypes['ItemsFromWishlist']> = {
   data?: Resolver<Array<ResolversTypes['ID']>, ParentType, ContextType>;
   totalItems?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -822,12 +865,14 @@ export type ItemsFromWishlistResolvers<ContextType = Context, ParentType extends
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   addGuitar?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationAddGuitarArgs, 'newGuitar'>>;
   addGuitarFilter?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationAddGuitarFilterArgs, 'newGuitarFilter'>>;
+  addItemToCheckout?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationAddItemToCheckoutArgs, 'id'>>;
   addItemToWishlist?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationAddItemToWishlistArgs, 'id'>>;
   login?: Resolver<ResolversTypes['Tokens'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'loginCredentials'>>;
   register?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'registerCredentials'>>;
   removeGuitar?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationRemoveGuitarArgs, 'id'>>;
   removeGuitarFilter?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationRemoveGuitarFilterArgs, 'id'>>;
   removeGuitarImage?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationRemoveGuitarImageArgs, 'guitarId'>>;
+  removeItemfromCheckout?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationRemoveItemfromCheckoutArgs, 'id'>>;
   removeItemfromWishlist?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationRemoveItemfromWishlistArgs, 'id'>>;
   removeUser?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType>;
   renewAccessToken?: Resolver<ResolversTypes['AccessTokenResponse'], ParentType, ContextType, RequireFields<MutationRenewAccessTokenArgs, 'refreshCredentials'>>;
@@ -843,6 +888,7 @@ export type QueryResolvers<ContextType = Context, ParentType extends ResolversPa
   getGuitarFilter?: Resolver<ResolversTypes['GuitarFilter'], ParentType, ContextType, RequireFields<QueryGetGuitarFilterArgs, 'id'>>;
   getGuitarFilters?: Resolver<ResolversTypes['GuitarFiltersList'], ParentType, ContextType, RequireFields<QueryGetGuitarFiltersArgs, 'limit' | 'offset' | 'type'>>;
   getGuitars?: Resolver<ResolversTypes['GuitarsList'], ParentType, ContextType, RequireFields<QueryGetGuitarsArgs, 'filters' | 'limit' | 'offset' | 'sort'>>;
+  getGuitarsFromCheckout?: Resolver<ResolversTypes['ItemsFromCheckout'], ParentType, ContextType>;
   getGuitarsFromWishlist?: Resolver<ResolversTypes['ItemsFromWishlist'], ParentType, ContextType>;
   getGuitarsPopulated?: Resolver<ResolversTypes['GuitarsListPopulated'], ParentType, ContextType, RequireFields<QueryGetGuitarsPopulatedArgs, 'filters' | 'limit' | 'offset' | 'sort'>>;
   getGuitarsPopulatedOptionally?: Resolver<ResolversTypes['GuitarsListPopulated'], ParentType, ContextType, RequireFields<QueryGetGuitarsPopulatedOptionallyArgs, 'filters' | 'limit' | 'offset' | 'sort'>>;
@@ -889,6 +935,8 @@ export type Resolvers<ContextType = Context> = {
   GuitarsList?: GuitarsListResolvers<ContextType>;
   GuitarsListPopulated?: GuitarsListPopulatedResolvers<ContextType>;
   GuitarsListWithdataLoder?: GuitarsListWithdataLoderResolvers<ContextType>;
+  ItemFromCheckout?: ItemFromCheckoutResolvers<ContextType>;
+  ItemsFromCheckout?: ItemsFromCheckoutResolvers<ContextType>;
   ItemsFromWishlist?: ItemsFromWishlistResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;

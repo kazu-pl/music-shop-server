@@ -125,6 +125,16 @@ type ItemsFromWishlist {
   totalItems: Int!
 }
 
+type ItemFromCheckout {
+  id: ID!
+  quantity: Int!
+}
+
+type ItemsFromCheckout {
+  data: [ItemFromCheckout!]!
+  totalItems: Int!
+}
+
 enum SortByKeys {
   NAME
   PRICE
@@ -226,6 +236,7 @@ type Query {
   getGuitar(id: ID!): Guitar!
 
   getGuitarsFromWishlist: ItemsFromWishlist!
+  getGuitarsFromCheckout: ItemsFromCheckout!
 }
 
 type Mutation {
@@ -275,4 +286,13 @@ type Mutation {
   **PROTECTED**
   """
   removeItemfromWishlist(id: ID!): SuccessfulReqMsg!
+
+  """
+  **PROTECTED**
+  """
+  addItemToCheckout(id: ID!): SuccessfulReqMsg!
+  """
+  **PROTECTED**
+  """
+  removeItemfromCheckout(id: ID!): SuccessfulReqMsg!
 }
