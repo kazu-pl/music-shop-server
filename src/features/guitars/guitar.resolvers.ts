@@ -23,8 +23,9 @@ import getSortBy from "utils/db/getSortBy";
 import getFilters from "utils/db/getFilters";
 import getSortOrder from "utils/db/getSortOrder";
 import checkIfGivenMemberIsQuered from "../../utils/checkIfGivenMemberIsQuered";
-import UserModel from "features/auth/models/User.model";
+import UserModel, { CheckoutItem } from "features/auth/models/User.model";
 import AUTH_MESSAGES from "constants/AUTH_MESSAGES";
+import findItemIndexOnCheckoutList from "./utils/findItemIndexOnCheckoutList";
 
 const guitarResolvers: Resolvers = {
   Upload: GraphQLUpload,
@@ -233,6 +234,26 @@ const guitarResolvers: Resolvers = {
       return {
         data: (user.data.wishlist as unknown as string[]) || [],
         totalItems: user.data.wishlist.length,
+      };
+    },
+    getGuitarsFromCheckout: async (parent, args, context) => {
+      checkAuthentication(context.user);
+      // mam w stashu zmiany dotyczące fretsNumber itd
+      const user = await UserModel.findOne({
+        _id: context.user?._id,
+      }).exec();
+
+      if (!user) {
+        throw new GraphQLError(AUTH_MESSAGES.ACCOUNT_DOESNT_EXIST);
+      }
+
+      return {
+        data: user.data.checkout || [],
+        totalItems: Array.isArray(user.data.checkout)
+          ? user.data.checkout.reduce((acc, curr) => {
+              return acc + curr.quantity;
+            }, 0)
+          : 0,
       };
     },
   },
@@ -465,6 +486,124 @@ const guitarResolvers: Resolvers = {
 
         return {
           message: COMMON_MESSAGES.REMOVED_FROM_WISHLIST,
+        };
+      } catch (error) {
+        throw new GraphQLError(COMMON_MESSAGES.AN_ERROR_OCCURED);
+      }
+    },
+
+    addItemToCheckout: async (parent, args, context) => {
+      checkAuthentication(context.user);
+
+      const idOfNewItem = args.id;
+
+      const user = await UserModel.findOne({
+        _id: context.user?._id,
+      }).exec();
+
+      if (!user) {
+        throw new GraphQLError(AUTH_MESSAGES.ACCOUNT_DOESNT_EXIST);
+      }
+      console.log({
+        findItemIndexOnCheckoutList: findItemIndexOnCheckoutList(
+          idOfNewItem,
+          user
+        ),
+      });
+      try {
+        await user
+          .updateOne({
+            data: {
+              ...user.data,
+              checkout:
+                findItemIndexOnCheckoutList(idOfNewItem, user) > -1
+                  ? [
+                      ...(user.data.checkout || []).map(
+                        (item) =>
+                          ({
+                            id: item.id,
+                            quantity:
+                              item.id === idOfNewItem
+                                ? item.quantity + 1
+                                : item.quantity,
+                          } as CheckoutItem)
+                      ),
+                    ]
+                  : [
+                      ...(user.data.checkout || []),
+                      { id: idOfNewItem, quantity: 1 } as CheckoutItem,
+                    ],
+            },
+          })
+          .exec();
+
+        return {
+          message: COMMON_MESSAGES.ADDED_TO_CHECKOUT,
+        };
+      } catch (error) {
+        throw new GraphQLError(COMMON_MESSAGES.AN_ERROR_OCCURED);
+      }
+    },
+
+    removeItemfromCheckout: async (parent, args, context) => {
+      checkAuthentication(context.user);
+
+      const id = args.id;
+
+      const user = await UserModel.findOne({
+        _id: context.user?._id,
+      }).exec();
+
+      if (!user) {
+        throw new GraphQLError(AUTH_MESSAGES.ACCOUNT_DOESNT_EXIST);
+      }
+
+      const checkIfItsLastQuantity = (id: string) => {
+        return (
+          (user.data.checkout || ([] as CheckoutItem[])).find(
+            (item) => item.id === id
+          )?.quantity === 1
+        );
+      };
+
+      if (findItemIndexOnCheckoutList(id, user) === -1) {
+        return {
+          message: COMMON_MESSAGES.ITEM_DOES_NOT_EXIST_ON_CHECKOUT,
+        };
+      }
+
+      try {
+        await user
+          .updateOne({
+            data: {
+              ...user.data,
+              checkout:
+                user.data.checkout.length === 1 && checkIfItsLastQuantity(id)
+                  ? []
+                  : user.data.checkout.length > 1 && checkIfItsLastQuantity(id)
+                  ? [
+                      ...(user.data.checkout || []).filter(
+                        (item) => item.id !== id
+                      ),
+                    ]
+                  : [
+                      ...(user.data.checkout || []).map(
+                        (item) =>
+                          ({
+                            id: item.id,
+                            quantity:
+                              item.id === id
+                                ? item.quantity - 1
+                                : item.quantity,
+                          } as CheckoutItem)
+                      ),
+                    ],
+            },
+          })
+          .exec();
+
+        return {
+          message: COMMON_MESSAGES.REMOVED_FROM_CHECKOUT,
         };
       } catch (error) {
         throw new GraphQLError(COMMON_MESSAGES.AN_ERROR_OCCURED);
