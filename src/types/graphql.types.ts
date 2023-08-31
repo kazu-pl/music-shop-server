@@ -279,6 +279,10 @@ export type Mutation = {
   removeUser: SuccessfulReqMsg;
   /** use this to get new accessToken if yours expired. Pass refreshToken to obtain accessToken */
   renewAccessToken: AccessTokenResponse;
+  /** **PROTECTED** */
+  resetWholeCheckout: SuccessfulReqMsg;
+  /** **PROTECTED** */
+  resetWholeWishlist: SuccessfulReqMsg;
   /**
    * **PROTECTED**
    * -
@@ -876,6 +880,8 @@ export type MutationResolvers<ContextType = Context, ParentType extends Resolver
   removeItemfromWishlist?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationRemoveItemfromWishlistArgs, 'id'>>;
   removeUser?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType>;
   renewAccessToken?: Resolver<ResolversTypes['AccessTokenResponse'], ParentType, ContextType, RequireFields<MutationRenewAccessTokenArgs, 'refreshCredentials'>>;
+  resetWholeCheckout?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType>;
+  resetWholeWishlist?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType>;
   updateGuitar?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationUpdateGuitarArgs, 'guitar'>>;
   updateGuitarFilter?: Resolver<ResolversTypes['SuccessfulReqMsg'], ParentType, ContextType, RequireFields<MutationUpdateGuitarFilterArgs, 'guitarFilter'>>;
   updateGuitarImage?: Resolver<ResolversTypes['ID'], ParentType, ContextType, RequireFields<MutationUpdateGuitarImageArgs, 'guitarId' | 'image'>>;

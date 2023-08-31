@@ -491,7 +491,34 @@ const guitarResolvers: Resolvers = {
         throw new GraphQLError(COMMON_MESSAGES.AN_ERROR_OCCURED);
       }
     },
+    resetWholeWishlist: async (parent, args, context) => {
+      checkAuthentication(context.user);
 
+      const user = await UserModel.findOne({
+        _id: context.user?._id,
+      }).exec();
+
+      if (!user) {
+        throw new GraphQLError(AUTH_MESSAGES.ACCOUNT_DOESNT_EXIST);
+      }
+
+      try {
+        await user
+          .updateOne({
+            data: {
+              ...user.data,
+              wishlist: [],
+            },
+          })
+          .exec();
+
+        return {
+          message: COMMON_MESSAGES.CLEARED_WHOLE_WISHLIST,
+        };
+      } catch (error) {
+        throw new GraphQLError(COMMON_MESSAGES.AN_ERROR_OCCURED);
+      }
+    },
     addItemToCheckout: async (parent, args, context) => {
       checkAuthentication(context.user);
 
@@ -504,12 +531,7 @@ const guitarResolvers: Resolvers = {
       if (!user) {
         throw new GraphQLError(AUTH_MESSAGES.ACCOUNT_DOESNT_EXIST);
       }
-      console.log({
-        findItemIndexOnCheckoutList: findItemIndexOnCheckoutList(
-          idOfNewItem,
-          user
-        ),
-      });
+
       try {
         await user
           .updateOne({
@@ -604,6 +626,34 @@ const guitarResolvers: Resolvers = {
 
         return {
           message: COMMON_MESSAGES.REMOVED_FROM_CHECKOUT,
+        };
+      } catch (error) {
+        throw new GraphQLError(COMMON_MESSAGES.AN_ERROR_OCCURED);
+      }
+    },
+    resetWholeCheckout: async (parent, args, context) => {
+      checkAuthentication(context.user);
+
+      const user = await UserModel.findOne({
+        _id: context.user?._id,
+      }).exec();
+
+      if (!user) {
+        throw new GraphQLError(AUTH_MESSAGES.ACCOUNT_DOESNT_EXIST);
+      }
+
+      try {
+        await user
+          .updateOne({
+            data: {
+              ...user.data,
+              checkout: [],
+            },
+          })
+          .exec();
+
+        return {
+          message: COMMON_MESSAGES.CLEARED_WHOLE_CHECKOUT,
         };
       } catch (error) {
         throw new GraphQLError(COMMON_MESSAGES.AN_ERROR_OCCURED);

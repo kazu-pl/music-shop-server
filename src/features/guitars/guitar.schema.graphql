@@ -286,6 +286,10 @@ type Mutation {
   **PROTECTED**
   """
   removeItemfromWishlist(id: ID!): SuccessfulReqMsg!
+  """
+  **PROTECTED**
+  """
+  resetWholeWishlist: SuccessfulReqMsg!
 
   """
   **PROTECTED**
@@ -295,4 +299,8 @@ type Mutation {
   **PROTECTED**
   """
   removeItemfromCheckout(id: ID!): SuccessfulReqMsg!
+  """
+  **PROTECTED**
+  """
+  resetWholeCheckout: SuccessfulReqMsg!
 }
