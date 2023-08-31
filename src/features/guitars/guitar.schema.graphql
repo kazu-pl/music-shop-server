@@ -120,6 +120,21 @@ input UpdateGuitarInput {
   guitarTypeId: String!
 }
 
+type ItemsFromWishlist {
+  data: [ID!]!
+  totalItems: Int!
+}
+
+type ItemFromCheckout {
+  id: ID!
+  quantity: Int!
+}
+
+type ItemsFromCheckout {
+  data: [ItemFromCheckout!]!
+  totalItems: Int!
+}
+
 enum SortByKeys {
   NAME
   PRICE
@@ -145,6 +160,8 @@ input GetGuitarsFilters {
   ids: [ID!]
   price: PriceRange
   stringsNumber: Int
+  fretsNumber: Int
+  scaleLength: Float
   """
   Id of producer
   """
@@ -217,6 +234,9 @@ type Query {
   ): GuitarsListPopulated!
 
   getGuitar(id: ID!): Guitar!
+
+  getGuitarsFromWishlist: ItemsFromWishlist!
+  getGuitarsFromCheckout: ItemsFromCheckout!
 }
 
 type Mutation {
@@ -257,4 +277,22 @@ type Mutation {
   remove guitar image
   """
   removeGuitarImage(guitarId: ID!): SuccessfulReqMsg!
+
+  """
+  **PROTECTED**
+  """
+  addItemToWishlist(id: ID!): SuccessfulReqMsg!
+  """
+  **PROTECTED**
+  """
+  removeItemfromWishlist(id: ID!): SuccessfulReqMsg!
+
+  """
+  **PROTECTED**
+  """
+  addItemToCheckout(id: ID!): SuccessfulReqMsg!
+  """
+  **PROTECTED**
+  """
+  removeItemfromCheckout(id: ID!): SuccessfulReqMsg!
 }

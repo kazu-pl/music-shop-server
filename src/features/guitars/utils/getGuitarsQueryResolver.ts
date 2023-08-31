@@ -19,7 +19,7 @@ const getGuitarsQueryResolver = async <DataType>(
     limit = 5,
     offset = 0,
     sort,
-    filters: { ids, ...filters },
+    filters: { ids, fretsNumber, scaleLength, ...filters },
   } = args;
 
   const sortBy = getSortBy(sort.sortBy);
@@ -47,12 +47,24 @@ const getGuitarsQueryResolver = async <DataType>(
       promiseToGetPopulatedData.where("_id").in([...ids]);
     }
 
+    if (fretsNumber) {
+      promiseToGetPopulatedData.where("fretsNumber").equals(fretsNumber);
+    }
+
+    if (scaleLength) {
+      promiseToGetPopulatedData.where("scaleLength").equals(scaleLength);
+    }
+
     const [data, totalItems] = await Promise.all([
       promiseToGetPopulatedData
         .skip(offset as number)
         .limit(limit as number)
         .sort({ [sortBy]: sortOrder }), // 1 for asc, -1 for desc
-      GuitarModel.countDocuments({ ...filtersToUse }),
+      ids
+        ? GuitarModel.countDocuments({ ...filtersToUse })
+            .where("_id")
+            .in([...ids])
+        : GuitarModel.countDocuments({ ...filtersToUse }),
     ]);
 
     guitarList = data;
@@ -66,13 +78,25 @@ const getGuitarsQueryResolver = async <DataType>(
       promiseToGetDataDefault.where("_id").in([...ids]);
     }
 
+    if (fretsNumber) {
+      promiseToGetDataDefault.where("fretsNumber").equals(fretsNumber);
+    }
+
+    if (scaleLength) {
+      promiseToGetDataDefault.where("scaleLength").equals(scaleLength);
+    }
+
     const [data, totalItems] = await Promise.all([
       promiseToGetDataDefault
         // .populate("availability") // add this if you want to get availablity filter instead of just its id
         .skip(offset as number)
         .limit(limit as number)
         .sort({ [sortBy]: sortOrder }), // 1 for asc, -1 for desc
-      GuitarModel.countDocuments({ ...filtersToUse }),
+      ids
+        ? GuitarModel.countDocuments({ ...filtersToUse })
+            .where("_id")
+            .in([...ids])
+        : GuitarModel.countDocuments({ ...filtersToUse }),
     ]);
     guitarList = data;
     totalGuitarsNumber = totalItems;

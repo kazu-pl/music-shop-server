@@ -1,5 +1,10 @@
 import mongoose, { Schema, Document } from "mongoose";
 
+export interface CheckoutItem {
+  id: string;
+  quantity: number;
+}
+
 export interface User extends Document {
   password: string;
   data: {
@@ -11,6 +16,8 @@ export interface User extends Document {
     streetNumber: string;
     postalCode: string;
     city: string;
+    wishlist: string[];
+    checkout: CheckoutItem[];
   };
 }
 
