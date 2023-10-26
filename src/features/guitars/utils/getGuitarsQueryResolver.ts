@@ -114,7 +114,7 @@ const getGuitarsQueryResolver = async <DataType>(
       : mode === "populated"
       ? "(with populated all fields) "
       : mode === "default"
-      ? "(with default apollo resolver) "
+      ? "(with default resolver) "
       : "";
 
   // eslint-disable-next-line no-console
